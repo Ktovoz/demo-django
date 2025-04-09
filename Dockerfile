@@ -33,7 +33,7 @@ COPY --from=builder /app/requirements.txt .
 RUN pip install --no-cache /wheels/*
 
 # 创建必要的目录
-RUN mkdir -p /app/static /app/staticfiles /app/media /app/data && \
+RUN mkdir -p /app/demo/static /app/staticfiles /app/media /app/data && \
     chown -R appuser:appuser /app
 
 # 复制项目文件
