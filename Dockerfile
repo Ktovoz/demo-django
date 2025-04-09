@@ -1,12 +1,12 @@
 # 使用Python 3.9作为基础镜像
-FROM python:3.9-slim-buster as builder
+FROM python:3.9-slim-buster AS builder
 
 # 设置工作目录
 WORKDIR /app
 
 # 设置环境变量
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # 安装系统依赖
 RUN apt-get update && \
