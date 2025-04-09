@@ -30,7 +30,7 @@ COPY --from=builder /app/wheels /wheels
 COPY --from=builder /app/requirements.txt .
 
 # 安装依赖
-RUN pip install --no-cache /wheels/*
+RUN pip install --no-cache-dir -r requirements.txt
 
 # 创建必要的目录
 RUN mkdir -p /app/demo/static /app/staticfiles /app/media /app/data && \
