@@ -12,6 +12,12 @@ python manage.py migrate
 echo "收集静态文件..."
 python manage.py collectstatic --noinput
 
-# 启动开发服务器
-echo "启动 Django 开发服务器..."
-exec python manage.py runserver 0.0.0.0:8000 
+# 启动 Gunicorn
+echo "启动 Gunicorn 服务器..."
+exec gunicorn DjangoProject.wsgi:application \
+    --bind 0.0.0.0:8000 \
+    --workers 4 \
+    --log-level=info \
+    --access-logfile=- \
+    --error-logfile=- \
+    --capture-output 
