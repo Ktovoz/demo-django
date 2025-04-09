@@ -35,6 +35,10 @@ RUN pip install --no-cache /wheels/*
 # 复制项目文件
 COPY . .
 
+# 创建日志目录并设置权限
+RUN mkdir -p /var/log/gunicorn && \
+    chown -R appuser:appuser /var/log/gunicorn
+
 # 切换到非root用户
 USER appuser
 
@@ -42,4 +46,4 @@ USER appuser
 EXPOSE 8000
 
 # 启动命令
-CMD ["gunicorn", "DjangoProject.wsgi:application", "--bind", "127.0.0.1:8000"] 
+CMD ["gunicorn", "DjangoProject.wsgi:application", "-c", "gunicorn.conf.py"] 
