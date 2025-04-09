@@ -42,4 +42,4 @@ USER appuser
 EXPOSE 8000
 
 # 启动命令
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "DjangoProject.asgi:application", "--host", "0.0.0.0", "--port", "8000"]
