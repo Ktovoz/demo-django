@@ -42,4 +42,4 @@ USER appuser
 EXPOSE 8000
 
 # 启动命令
-CMD ["gunicorn", "DjangoProject.wsgi:application", "-c", "gunicorn.conf.py"]
+CMD ["uvicorn", "--config", "uvicorn.json"]
