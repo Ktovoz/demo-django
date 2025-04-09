@@ -19,10 +19,10 @@ worker_connections = 1000
 proc_name = 'DjangoProject'
 
 # 访问日志文件
-accesslog = '/var/log/gunicorn/access.log'
+accesslog = '/app/logs/access.log'
 
 # 错误日志文件
-errorlog = '/var/log/gunicorn/error.log'
+errorlog = '/app/logs/error.log'
 
 # 日志级别
 loglevel = 'info'
@@ -31,7 +31,7 @@ loglevel = 'info'
 daemon = False
 
 # 进程pid文件
-pidfile = '/var/run/gunicorn.pid'
+pidfile = '/app/gunicorn.pid'
 
 # 启动前是否预加载应用
 preload_app = True

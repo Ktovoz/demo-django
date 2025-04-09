@@ -35,9 +35,11 @@ RUN pip install --no-cache /wheels/*
 # 复制项目文件
 COPY . .
 
-# 创建日志目录并设置权限
+# 创建必要的目录并设置权限
 RUN mkdir -p /var/log/gunicorn && \
-    chown -R appuser:appuser /var/log/gunicorn
+    mkdir -p /app/logs && \
+    chown -R appuser:appuser /var/log/gunicorn && \
+    chown -R appuser:appuser /app
 
 # 切换到非root用户
 USER appuser
