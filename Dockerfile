@@ -35,6 +35,9 @@ RUN pip install --no-cache /wheels/*
 # 复制项目文件
 COPY . .
 
+# 添加执行权限到启动脚本
+RUN chmod +x entrypoint.sh
+
 # 切换到非root用户
 USER appuser
 
@@ -42,4 +45,4 @@ USER appuser
 EXPOSE 8000
 
 # 启动命令
-CMD ["gunicorn", "DjangoProject.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4"]
+CMD ["./entrypoint.sh"]
