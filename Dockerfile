@@ -32,11 +32,16 @@ COPY --from=builder /app/requirements.txt .
 # 安装依赖
 RUN pip install --no-cache /wheels/*
 
+# 创建必要的目录
+RUN mkdir -p /app/static /app/staticfiles /app/media /app/data && \
+    chown -R appuser:appuser /app
+
 # 复制项目文件
 COPY . .
 
 # 添加执行权限到启动脚本
-RUN chmod +x entrypoint.sh
+RUN chmod +x entrypoint.sh && \
+    chown -R appuser:appuser /app
 
 # 切换到非root用户
 USER appuser
