@@ -29,7 +29,7 @@ def login_view(request):
         
         if user is not None:
             login(request, user)
-            return redirect('/')
+            return redirect('demo:home')
         else:
             messages.error(request, '用户名或密码错误')
             return render(request, 'demo/login.html', {'title': '用户登录'})
@@ -58,8 +58,7 @@ def register_view(request):
             user.save()
             
             login(request, user)
-            messages.success(request, '注册成功')
-            return redirect('/')
+            return redirect('demo:home')
         except Exception as e:
             messages.error(request, '注册失败，请稍后重试')
             return render(request, 'demo/register.html', {'title': '用户注册'})
@@ -322,66 +321,87 @@ def change_user_group(request, user_id):
 
 @require_http_methods(["GET"])
 def init_system(request, password):
-
     init_password = 'admin123'  
 
     if password != init_password:
-        return JsonResponse({'status': 'error', 'message': '密码错误'}, status=403)
+        return JsonResponse({'status': 'error', 'message': '初始化密码错误'}, status=403)
 
     try:
-     
-        User.objects.all().delete()
-        Group.objects.all().delete()
-        
-
-        superadmin_group = Group.objects.create(name='超级管理员')
-        admin_group = Group.objects.create(name='管理员')
-        user_group = Group.objects.create(name='普通用户')
-        
-
-
-        user_ct = ContentType.objects.get_for_model(User)
-        group_ct = ContentType.objects.get_for_model(Group)
-        user_permissions = Permission.objects.filter(content_type=user_ct)
-        group_permissions = Permission.objects.filter(content_type=group_ct)
-        
-  
-        superadmin_group.permissions.set(list(user_permissions) + list(group_permissions))
-        
-  
-        admin_user_permissions = [
-            Permission.objects.get(codename='add_user', content_type=user_ct),
-            Permission.objects.get(codename='change_user', content_type=user_ct),
-            Permission.objects.get(codename='delete_user', content_type=user_ct),
-            Permission.objects.get(codename='view_user', content_type=user_ct),
-            Permission.objects.get(codename='view_group', content_type=group_ct),
-        ]
-        admin_group.permissions.set(admin_user_permissions)
-        
-
-        user_view_permissions = [
-            Permission.objects.get(codename='view_user', content_type=user_ct),
-            Permission.objects.get(codename='view_group', content_type=group_ct),
-        ]
-        user_group.permissions.set(user_view_permissions)
-        
-     
-        admin_user = User.objects.create_superuser(
-            username='admin',
-            password='admin',
-            email='admin@example.com'
-        )
-        admin_user.groups.add(superadmin_group)
-        
-        return JsonResponse({'status': 'success', 'message': '系统初始化成功'})
-    except Exception as e:
-        
+        # 清理现有数据
         try:
             User.objects.all().delete()
             Group.objects.all().delete()
-            return JsonResponse({'status': 'error', 'message': f'初始化失败，已清理数据。错误信息：{str(e)}'}, status=500)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'清理现有数据失败：{str(e)}'}, status=500)
+
+        # 创建用户组
+        try:
+            superadmin_group = Group.objects.create(name='超级管理员')
+            admin_group = Group.objects.create(name='管理员')
+            user_group = Group.objects.create(name='普通用户')
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'创建用户组失败：{str(e)}'}, status=500)
+
+        # 设置权限
+        try:
+            user_ct = ContentType.objects.get_for_model(User)
+            group_ct = ContentType.objects.get_for_model(Group)
+            user_permissions = Permission.objects.filter(content_type=user_ct)
+            group_permissions = Permission.objects.filter(content_type=group_ct)
+            
+            # 超级管理员权限
+            superadmin_group.permissions.set(list(user_permissions) + list(group_permissions))
+            
+            # 管理员权限
+            admin_user_permissions = Permission.objects.filter(
+                content_type__in=[user_ct, group_ct],
+                codename__in=['add_user', 'change_user', 'delete_user', 'view_user', 'view_group']
+            )
+            admin_group.permissions.set(admin_user_permissions)
+            
+            # 普通用户权限
+            user_view_permissions = Permission.objects.filter(
+                content_type__in=[user_ct, group_ct],
+                codename__in=['view_user', 'view_group']
+            )
+            user_group.permissions.set(user_view_permissions)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'设置权限失败：{str(e)}'}, status=500)
+
+        # 创建超级管理员用户
+        try:
+            admin_user = User.objects.create_superuser(
+                username='admin',
+                password='admin',
+                email='admin@example.com'
+            )
+            admin_user.groups.add(superadmin_group)
+            admin_user.save()
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'创建管理员用户失败：{str(e)}'}, status=500)
+        
+        return JsonResponse({
+            'status': 'success', 
+            'message': '系统初始化成功',
+            'data': {
+                'admin_username': 'admin',
+                'admin_password': 'admin'
+            }
+        })
+    except Exception as e:
+        # 发生未知错误时，尝试清理所有数据
+        try:
+            User.objects.all().delete()
+            Group.objects.all().delete()
+            return JsonResponse({
+                'status': 'error', 
+                'message': f'初始化过程中发生未知错误，已清理数据。错误信息：{str(e)}'
+            }, status=500)
         except Exception as cleanup_error:
-            return JsonResponse({'status': 'error', 'message': f'初始化和清理均失败。错误信息：{str(cleanup_error)}'}, status=500)
+            return JsonResponse({
+                'status': 'error', 
+                'message': f'初始化和清理均失败。错误信息：{str(cleanup_error)}'
+            }, status=500)
 
 # 修改密码
 @login_required
