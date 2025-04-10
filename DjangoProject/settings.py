@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+9in_p&w8b(#qkq2xujph8u%ue*rnn$%y529_q**sg2)+l!0y('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -136,3 +136,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS设置
 CORS_ALLOW_ALL_ORIGINS = True  # 开发环境下允许所有源
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
+
+# CSRF设置
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.ktovoz.cn',
+    'https://*.ktovoz.com',
+    'http://*.ktovoz.cn',
+    'http://*.ktovoz.com',
+]
