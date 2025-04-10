@@ -31,9 +31,10 @@ def login_view(request):
             login(request, user)
             return redirect('/')
         else:
-            return render(request, 'demo/login.html', {'error_message': '用户名或密码错误'})
+            messages.error(request, '用户名或密码错误')
+            return render(request, 'demo/login.html', {'title': '用户登录'})
     
-    return render(request, 'demo/login.html')
+    return render(request, 'demo/login.html', {'title': '用户登录'})
 
 def register_view(request):
     if request.method == 'POST':
@@ -43,11 +44,11 @@ def register_view(request):
 
         if password1 != password2:
             messages.error(request, '两次输入的密码不一致')
-            return render(request, 'demo/register.html')
+            return render(request, 'demo/register.html', {'title': '用户注册'})
 
         if User.objects.filter(username=username).exists():
             messages.error(request, '用户名已存在')
-            return render(request, 'demo/register.html')
+            return render(request, 'demo/register.html', {'title': '用户注册'})
 
         try:
             user = User.objects.create_user(username=username, password=password1)
@@ -61,9 +62,9 @@ def register_view(request):
             return redirect('/')
         except Exception as e:
             messages.error(request, '注册失败，请稍后重试')
-            return render(request, 'demo/register.html')
+            return render(request, 'demo/register.html', {'title': '用户注册'})
 
-    return render(request, 'demo/register.html')
+    return render(request, 'demo/register.html', {'title': '用户注册'})
 
 @login_required(login_url='demo:login')
 @permission_required('auth.view_user', login_url='demo:login')
