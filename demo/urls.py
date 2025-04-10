@@ -6,9 +6,7 @@ from django.views.generic import RedirectView
 app_name = 'demo'
 
 urlpatterns = [
-
     path('init/<str:password>/', views.init_system, name='init_system'),
-    path('init/<str:password>', RedirectView.as_view(permanent=True, pattern_name='demo:init_system'), name='init_system_redirect'),
     
     path('', views.home, name='home'),
     path('login/', views.login_view, name='login'),
