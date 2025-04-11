@@ -423,3 +423,20 @@ def change_password(request, user_id):
         return JsonResponse({'status': 'success', 'message': '密码修改成功'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@login_required(login_url='demo:login')
+@permission_required('auth.view_user', login_url='demo:login')
+def users_api(request):
+    users = User.objects.all()
+    return JsonResponse({
+        'users': [
+            {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'group_name': user.groups.first().name if user.groups.exists() else None,
+                'is_active': user.is_active
+            }
+            for user in users
+        ]
+    })

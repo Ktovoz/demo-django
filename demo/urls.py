@@ -13,7 +13,8 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     path('logout/', LogoutView.as_view(next_page='demo:login', template_name='demo/login.html'), name='logout'),
     
-
+    # API endpoints
+    path('users/api/', views.users_api, name='users_api'),
     path('users/', views.user_list, name='user_list'),
     path('users/create/', views.user_create, name='user_create'),
     path('users/<int:user_id>/', views.user_detail_api, name='user_detail_api'),
