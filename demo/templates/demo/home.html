@@ -4,373 +4,439 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body {
-            height: 100vh;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
             display: flex;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-  
-        .sidebar {
-            width: 280px;
-            background: rgba(255, 255, 255, 0.97);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            padding: 1rem;
+
+        nav.sidebar {
+            width: 250px;
+            background: rgba(255, 255, 255, 0.9);
+            height: 100vh;
+            padding: 15px;
+            position: fixed;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
             overflow-y: auto;
+            z-index: 1000;
         }
-        .main-content {
+
+        main {
             flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
+            padding: 20px;
+            margin-left: 300px;
         }
-      
+
         .content-card {
             background: rgba(255, 255, 255, 0.97);
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 1.5rem;
+            padding: 20px;
+            margin-bottom: 20px;
         }
-   
-        .nav-link[aria-expanded="false"] .bi-chevron-down {
-            display: none;
-        }
-        .nav-link[aria-expanded="true"] .bi-chevron-right {
-            display: none;
-        }
-        
-   
+
         .user-info {
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-        .user-info h6 {
-            color: #333;
-            font-weight: 600;
-        }
-        .modal-header {
+            padding: 20px;
+            border-radius: 12px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .btn-close {
-            filter: brightness(0) invert(1);
+
+        .collection {
+            border: none;
+            margin: 0;
+        }
+
+        .collection .collection-header {
+            background: none;
+            border-bottom: none;
+            padding: 15px 20px 10px;
+            margin-bottom: 10px;
+        }
+
+        .collection .collection-header h5 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .collection .collection-item {
+            border: none;
+            padding: 12px 20px;
+            margin: 5px 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+
+        .collection .collection-item:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+
+        .collection .collection-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .collection .collection-item i {
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-floating {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .btn-floating:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: scale(1.05);
+        }
+
+        .modal {
+            border-radius: 8px;
+        }
+
+        .modal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .modal .modal-footer {
+            background-color: #f5f5f5;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .badge {
+            border-radius: 12px;
+            padding: 3px 10px;
+        }
+
+        .badge.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .badge.inactive {
+            background-color: #f44336;
+            color: white;
+        }
+
+        table.highlight > tbody > tr:hover {
+            background-color: rgba(102, 126, 234, 0.1);
         }
     </style>
 </head>
 <body>
-
+    <!-- 侧边栏 -->
     <nav class="sidebar">
-      
-        <div class="user-info mb-4 p-3 bg-light rounded">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="mb-1">{{ user.username }}</h6>
-                    <small class="text-muted">{{ user.groups.all.0.name|default:"无用户组" }}</small>
+        <div class="user-info">
+            <div class="row mb-0">
+                <div class="col s8">
+                    <h6 class="white-text" style="margin: 0 0 5px 0; font-size: 1.2rem;">{{ user.username }}</h6>
+                    <span class="white-text" style="opacity: 0.8; font-size: 0.9rem;">{{ user.groups.all.0.name|default:"无用户组" }}</span>
                 </div>
-                <form method="post" action="{% url 'demo:logout' %}" class="m-0">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger btn-sm">
-                        登出
-                    </button>
-                </form>
+                <div class="col s4 right-align">
+                    <form method="post" action="{% url 'demo:logout' %}" style="margin: 0;">
+                        {% csrf_token %}
+                        <button class="btn-floating waves-effect waves-light" style="background: transparent; box-shadow: none;">
+                            <i class="material-icons">exit_to_app</i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
-        
-        <div class="list-group">
-            <a href="#" class="list-group-item list-group-item-action active" data-bs-toggle="collapse" data-bs-target="#userMenu">
-                用户管理
-            </a>
-            <div class="collapse show" id="userMenu">
-                <a href="#" class="list-group-item list-group-item-action ps-4" onclick="showUserList()">用户列表</a>
-                <a href="#" class="list-group-item list-group-item-action ps-4" onclick="showGroupList()">用户组管理</a>
-            </div>
-            
-     
-        </div>
+
+        <ul class="collection with-header">
+            <li class="collection-header"><h5>系统菜单</h5></li>
+            <li class="collection-item waves-effect" onclick="showUserList(this)" data-view="userListView">
+                <i class="material-icons">people</i>用户列表
+            </li>
+            <li class="collection-item waves-effect" onclick="showGroupList(this)" data-view="groupListView">
+                <i class="material-icons">group_work</i>用户组管理
+            </li>
+        </ul>
     </nav>
 
-    
-    <main class="main-content">
- 
+    <!-- 主要内容区 -->
+    <main>
+        <!-- 用户列表视图 -->
         <div class="content-card" id="userListView">
-            <div class="d-flex justify-content-between mb-4">
-                <h2 class="h4">用户列表</h2>
-                <div>
+            <div class="row">
+                <div class="col s6">
+                    <h4 class="header">用户列表</h4>
+                </div>
+                <div class="col s6 right-align">
                     {% if perms.auth.add_user %}
-                    <button class="btn btn-primary btn-sm me-2" onclick="showCreateUserModal()">
-                        新增用户
-                    </button>
+                    <a class="waves-effect waves-light btn" onclick="showCreateUserModal()">
+                        <i class="material-icons left">person_add</i>新增用户
+                    </a>
                     {% endif %}
-                    <button class="btn btn-secondary btn-sm" onclick="refreshUserList()">
-                        <i class="bi bi-arrow-clockwise"></i> 刷新列表
-                    </button>
+                    <a class="waves-effect waves-light btn" onclick="refreshUserList()">
+                        <i class="material-icons left">refresh</i>刷新
+                    </a>
                 </div>
             </div>
-            
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>用户名</th>
-                            <th>邮箱</th>
-                            <th>用户组</th>
-                            <th>状态</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userTableBody">
-                        {% for user in users %}
-                        <tr>
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.email|default:"-" }}</td>
-                            <td>{{ user.groups.all.0.name|default:"无" }}</td>
-                            <td>
-                                {% if user.is_active %}
-                                <span class="badge bg-success">正常</span>
-                                {% else %}
-                                <span class="badge bg-danger">禁用</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if perms.auth.change_user %}
-                                <button class="btn btn-sm btn-outline-primary me-1" onclick="showEditUserModal({{ user.id }})">
-                                    编辑
-                                </button>
-                                {% endif %}
-                                {% if perms.auth.change_user %}
-                                <button class="btn btn-sm btn-outline-warning me-1" onclick="showChangePasswordModal({{ user.id }})">
-                                    修改密码
-                                </button>
-                                {% endif %}
-                                {% if perms.auth.delete_user and user.id != request.user.id %}
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser({{ user.id }})">
-                                    删除
-                                </button>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+
+            <table class="highlight responsive-table">
+                <thead>
+                    <tr>
+                        <th>用户名</th>
+                        <th>邮箱</th>
+                        <th>用户组</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email|default:"-" }}</td>
+                        <td>{{ user.groups.all.0.name|default:"无" }}</td>
+                        <td>
+                            {% if user.is_active %}
+                            <span class="badge active">正常</span>
+                            {% else %}
+                            <span class="badge inactive">禁用</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if perms.auth.change_user %}
+                            <a class="waves-effect waves-light btn-small" onclick="showEditUserModal({{ user.id|escapejs }})">
+                                <i class="material-icons">edit</i>
+                            </a>
+                            <a class="waves-effect waves-light btn-small orange" onclick="showChangePasswordModal({{ user.id|escapejs }})">
+                                <i class="material-icons">lock</i>
+                            </a>
+                            {% endif %}
+                            {% if perms.auth.delete_user and user.id != request.user.id %}
+                            <a class="waves-effect waves-light btn-small red" onclick="deleteUser({{ user.id|escapejs }})">
+                                <i class="material-icons">delete</i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
-   
+        <!-- 用户组列表视图 -->
         <div class="content-card d-none" id="groupListView">
-            <div class="d-flex justify-content-between mb-4">
-                <h2 class="h4">用户组管理</h2>
+            <div class="row">
+                <div class="col s12">
+                    <h4 class="header">用户组管理</h4>
+                </div>
             </div>
-            
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>组名</th>
-                            <th>成员数量</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="groupTableBody">
-                        {% for group in groups %}
-                        <tr>
-                            <td>{{ group.name }}</td>
-                            <td>{{ group.user_set.count }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary" onclick="showGroupMembers({{ group.id }})">
-                                    查看成员
-                                </button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+
+            <table class="highlight responsive-table">
+                <thead>
+                    <tr>
+                        <th>组名</th>
+                        <th>成员数量</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="groupTableBody">
+                    {% for group in groups %}
+                    <tr>
+                        <td>{{ group.name }}</td>
+                        <td>{{ group.user_set.count }}</td>
+                        <td>
+                            <a class="waves-effect waves-light btn-small" onclick="showGroupMembers({{ group.id }})">
+                                <i class="material-icons left">group</i>查看成员
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </main>
 
-   
-    <div class="modal fade" id="userModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="userModalTitle">编辑用户</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- 用户编辑模态框 -->
+    <div id="userModal" class="modal">
+        <div class="modal-header">
+            <h5 id="userModalTitle">编辑用户</h5>
+        </div>
+        <div class="modal-content">
+            <form id="userForm">
+                {% csrf_token %}
+                <input type="hidden" id="userId">
+                <div class="input-field">
+                    <input type="text" id="username" required>
+                    <label for="username">用户名</label>
                 </div>
-                <div class="modal-body">
-                    <form id="userForm">
-                        {% csrf_token %}
-                        <input type="hidden" id="userId">
-                        <div class="mb-3">
-                            <label class="form-label">用户名</label>
-                            <input type="text" class="form-control" id="username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">邮箱</label>
-                            <input type="email" class="form-control" id="email">
-                        </div>
-                        <div class="mb-3" id="passwordGroup">
-                            <label class="form-label">密码</label>
-                            <input type="password" class="form-control" id="password">
-                            <div class="form-text">创建用户时必填，编辑用户时留空表示不修改密码</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">用户组</label>
-                            <select class="form-select" id="userGroup">
-                                <option value="">无</option>
-                                {% for group in groups %}
-                                <option value="{{ group.id }}">{{ group.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="isActive" checked>
-                                <label class="form-check-label">账号状态</label>
-                            </div>
-                        </div>
-                    </form>
+                <div class="input-field">
+                    <input type="email" id="email">
+                    <label for="email">邮箱</label>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" onclick="saveUser()">保存</button>
+                <div class="input-field" id="passwordGroup">
+                    <input type="password" id="password">
+                    <label for="password">密码</label>
+                    <span class="helper-text">创建用户时必填，编辑用户时留空表示不修改密码</span>
                 </div>
-            </div>
+                <div class="input-field">
+                    <select id="userGroup">
+                        <option value="">无</option>
+                        {% for group in groups %}
+                        <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label>用户组</label>
+                </div>
+                <div class="switch">
+                    <label>
+                        禁用
+                        <input type="checkbox" id="isActive" checked>
+                        <span class="lever"></span>
+                        正常
+                    </label>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-close waves-effect waves-light btn-flat">取消</a>
+            <a class="waves-effect waves-light btn" onclick="saveUser()">保存</a>
         </div>
     </div>
 
-
-    <div class="modal fade" id="groupModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="groupModalTitle">编辑用户组</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- 修改密码模态框 -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-header">
+            <h5 id="passwordModalTitle">修改密码</h5>
+        </div>
+        <div class="modal-content">
+            <form id="passwordForm">
+                {% csrf_token %}
+                <input type="hidden" id="passwordUserId">
+                {% if not user.is_superuser %}
+                <div class="input-field" id="oldPasswordGroup">
+                    <input type="password" id="oldPassword" required>
+                    <label for="oldPassword">旧密码</label>
                 </div>
-                <div class="modal-body">
-                    <form id="groupForm">
-                        {% csrf_token %}
-                        <input type="hidden" id="groupId">
-                        <div class="mb-3">
-                            <label class="form-label">组名</label>
-                            <input type="text" class="form-control" id="groupName" required>
-                        </div>
-                    </form>
+                {% endif %}
+                <div class="input-field">
+                    <input type="password" id="newPassword" required>
+                    <label for="newPassword">新密码</label>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" onclick="saveGroup()">保存</button>
-                </div>
-            </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-close waves-effect waves-light btn-flat">取消</a>
+            <a class="waves-effect waves-light btn" onclick="savePassword()">保存</a>
         </div>
     </div>
 
+    <!-- 用户组成员模态框 -->
+    <div id="groupMembersModal" class="modal modal-fixed-footer">
+        <div class="modal-header">
+            <h5 id="groupMembersModalTitle">用户组成员</h5>
+        </div>
+        <div class="modal-content">
+            <table class="highlight">
+                <thead>
+                    <tr>
+                        <th>用户名</th>
+                        <th>邮箱</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="groupMembersTableBody">
+                </tbody>
+            </table>
 
-    <div class="modal fade" id="passwordModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="passwordModalTitle">修改密码</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            {% if perms.auth.change_user %}
+            <div class="row">
+                <div class="input-field col s12">
+                    <select id="userToAdd">
+                        <option value="">选择用户...</option>
+                    </select>
+                    <label>添加用户到组</label>
                 </div>
-                <div class="modal-body">
-                    <form id="passwordForm">
-                        {% csrf_token %}
-                        <input type="hidden" id="passwordUserId">
-                        {% if not user.is_superuser %}
-                        <div class="mb-3" id="oldPasswordGroup">
-                            <label class="form-label">旧密码</label>
-                            <input type="password" class="form-control" id="oldPassword" required>
-                        </div>
-                        {% endif %}
-                        <div class="mb-3">
-                            <label class="form-label">新密码</label>
-                            <input type="password" class="form-control" id="newPassword" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" onclick="savePassword()">保存</button>
+                <div class="col s12">
+                    <a class="waves-effect waves-light btn" onclick="addUserToGroup()">
+                        <i class="material-icons left">person_add</i>添加
+                    </a>
                 </div>
             </div>
+            {% endif %}
+        </div>
+        <div class="modal-footer">
+            <a class="modal-close waves-effect waves-light btn-flat">关闭</a>
         </div>
     </div>
 
- 
-    <div class="modal fade" id="groupMembersModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="groupMembersModalTitle">用户组成员</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>用户名</th>
-                                    <th>邮箱</th>
-                                    <th>状态</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody id="groupMembersTableBody">
-                            </tbody>
-                        </table>
-                    </div>
-                    {% if perms.auth.change_user %}
-                    <div class="mt-3">
-                        <h6>添加用户到组</h6>
-                        <div class="input-group">
-                            <select class="form-select" id="userToAdd">
-                                <option value="">选择用户...</option>
-                            </select>
-                            <button class="btn btn-primary" onclick="addUserToGroup()">添加</button>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"></script>
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
-      
-        let userModal = null;
-        let groupModal = null;
-        let passwordModal = null;
-        let groupMembersModal = null;
+        const currentUserId = {{ request.user.id }};
+        const currentUserGroup = '{{ user.groups.all.0.name }}';
+        const currentUserName = '{{ user.username }}';
 
-
+        // 初始化 Materialize 组件
         document.addEventListener('DOMContentLoaded', function() {
-            userModal = new bootstrap.Modal(document.getElementById('userModal'));
-            groupModal = new bootstrap.Modal(document.getElementById('groupModal'));
-            passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
-            groupMembersModal = new bootstrap.Modal(document.getElementById('groupMembersModal'));
+            M.AutoInit();
+            var elems = document.querySelectorAll('.modal');
+            var instances = M.Modal.init(elems);
+            
+            var selects = document.querySelectorAll('select');
+            var selectInstances = M.FormSelect.init(selects);
         });
 
-      
-        function showUserList() {
-            document.getElementById('userListView').classList.remove('d-none');
-            document.getElementById('groupListView').classList.add('d-none');
+        // 视图切换
+        function showUserList(element) {
+            document.getElementById('userListView').style.display = 'block';
+            document.getElementById('groupListView').style.display = 'none';
+            // 更新侧边栏选中状态
+            updateMenuActiveState(element);
         }
 
-        function showGroupList() {
-            document.getElementById('userListView').classList.add('d-none');
-            document.getElementById('groupListView').classList.remove('d-none');
+        function showGroupList(element) {
+            document.getElementById('userListView').style.display = 'none';
+            document.getElementById('groupListView').style.display = 'block';
+            // 更新侧边栏选中状态
+            updateMenuActiveState(element);
         }
 
-     
+        // 页面加载时默认显示用户列表
+        document.addEventListener('DOMContentLoaded', function() {
+            showUserList(document.querySelector('.collection-item[data-view="userListView"]'));
+        });
+
+        function updateMenuActiveState(element) {
+            // 移除所有菜单项的active类
+            document.querySelectorAll('.collection-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            // 添加active类到当前点击的菜单项
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        // 用户相关操作
         function showCreateUserModal() {
             document.getElementById('userModalTitle').textContent = '新增用户';
             document.getElementById('userForm').reset();
             document.getElementById('userId').value = '';
-            userModal.show();
+            M.Modal.getInstance(document.getElementById('userModal')).open();
         }
 
         function showEditUserModal(userId) {
@@ -383,7 +449,9 @@
                     document.getElementById('email').value = data.email || '';
                     document.getElementById('userGroup').value = data.group_id || '';
                     document.getElementById('isActive').checked = data.is_active;
-                    userModal.show();
+                    M.updateTextFields();
+                    M.FormSelect.init(document.getElementById('userGroup'));
+                    M.Modal.getInstance(document.getElementById('userModal')).open();
                 });
         }
 
@@ -413,10 +481,11 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    userModal.hide();
+                    M.Modal.getInstance(document.getElementById('userModal')).close();
+                    M.toast({html: '操作成功', classes: 'rounded'});
                     location.reload();
                 } else {
-                    alert(data.message);
+                    M.toast({html: data.message, classes: 'rounded red'});
                 }
             });
         }
@@ -433,59 +502,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
+                    M.toast({html: '删除成功', classes: 'rounded'});
                     location.reload();
                 } else {
-                    alert(data.message);
+                    M.toast({html: data.message, classes: 'rounded red'});
                 }
             });
         }
 
-   
-        function showCreateGroupModal() {
-            document.getElementById('groupModalTitle').textContent = '新增用户组';
-            document.getElementById('groupForm').reset();
-            document.getElementById('groupId').value = '';
-            groupModal.show();
-        }
-
-        function showEditGroupModal(groupId) {
-            document.getElementById('groupModalTitle').textContent = '编辑用户组';
-            fetch(`/groups/${groupId}/`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('groupId').value = groupId;
-                    document.getElementById('groupName').value = data.name;
-                    groupModal.show();
-                });
-        }
-
-        function saveGroup() {
-            const groupId = document.getElementById('groupId').value;
-            const data = {
-                name: document.getElementById('groupName').value
-            };
-
-            const url = groupId ? `/groups/${groupId}/update/` : '/groups/create/';
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    groupModal.hide();
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
-            });
-        }
-
-        
+        // 密码相关操作
         function showChangePasswordModal(userId) {
             document.getElementById('passwordUserId').value = userId;
             document.getElementById('passwordForm').reset();
@@ -495,10 +520,9 @@
                 oldPasswordGroup.style.display = (userId == {{ request.user.id }}) ? 'none' : 'block';
             }
             
-            passwordModal.show();
+            M.Modal.getInstance(document.getElementById('passwordModal')).open();
         }
 
-      
         function savePassword() {
             const userId = document.getElementById('passwordUserId').value;
             const data = {
@@ -521,15 +545,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    passwordModal.hide();
-                    alert('密码修改成功');
+                    M.Modal.getInstance(document.getElementById('passwordModal')).close();
+                    M.toast({html: '密码修改成功', classes: 'rounded'});
                 } else {
-                    alert(data.message);
+                    M.toast({html: data.message, classes: 'rounded red'});
                 }
             });
         }
 
-  
+        // 用户组相关操作
         function showGroupMembers(groupId) {
             window.currentGroupId = groupId;
             
@@ -542,30 +566,32 @@
                     
                     data.members.forEach(member => {
                         const tr = document.createElement('tr');
+                        const currentUserGroup = '{{ user.groups.all.0.name }}';
+                        const currentUserName = '{{ user.username }}';
                         const canManageUser = (
-                            ('{{ user.groups.all.0.name }}' === '超级管理员' && member.username !== '{{ user.username }}') ||
-                            ('{{ user.groups.all.0.name }}' === '管理员' && data.group_name === '普通用户' && member.username !== '{{ user.username }}')
+                            (currentUserGroup === '超级管理员' && member.username !== currentUserName) ||
+                            (currentUserGroup === '管理员' && data.group_name === '普通用户' && member.username !== currentUserName)
                         );
                         
                         tr.innerHTML = `
                             <td>${member.username}</td>
                             <td>${member.email || '-'}</td>
                             <td>
-                                ${member.is_active ? 
-                                    '<span class="badge bg-success">正常</span>' : 
-                                    '<span class="badge bg-danger">禁用</span>'}
+                                <span class="badge ${member.is_active ? 'active' : 'inactive'}">
+                                    ${member.is_active ? '正常' : '禁用'}
+                                </span>
                             </td>
                             <td>
                                 ${canManageUser ? 
-                                    `<button class="btn btn-sm btn-danger" onclick="removeUserFromGroup(${member.id})">
-                                        移出组
-                                    </button>` : ''}
+                                    `<a class="waves-effect waves-light btn-small red" onclick="removeUserFromGroup(${member.id})">
+                                        <i class="material-icons">person_remove</i>
+                                    </a>` : ''}
                             </td>
                         `;
                         tbody.appendChild(tr);
                     });
                     
-                    const addUserSection = document.querySelector('#groupMembersModal .mt-3');
+                    const addUserSection = document.querySelector('#groupMembersModal .row');
                     if (addUserSection) {
                         const canManageGroup = (
                             '{{ user.groups.all.0.name }}' === '超级管理员' ||
@@ -582,19 +608,19 @@
                                     data.users.forEach(user => {
                                         select.innerHTML += `<option value="${user.id}">${user.username}</option>`;
                                     });
+                                    M.FormSelect.init(select);
                                 });
                         }
                     }
                     
-                    groupMembersModal.show();
+                    M.Modal.getInstance(document.getElementById('groupMembersModal')).open();
                 });
         }
 
-      
         function addUserToGroup() {
             const userId = document.getElementById('userToAdd').value;
             if (!userId) {
-                alert('请选择用户');
+                M.toast({html: '请选择用户', classes: 'rounded red'});
                 return;
             }
 
@@ -611,15 +637,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
+                    M.toast({html: '添加成功', classes: 'rounded'});
                     showGroupMembers(window.currentGroupId);
                     location.reload();
                 } else {
-                    alert(data.message);
+                    M.toast({html: data.message, classes: 'rounded red'});
                 }
             });
         }
 
-     
         function removeUserFromGroup(userId) {
             if (!confirm('确定要将此用户从组中移除吗？')) return;
 
@@ -636,17 +662,23 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
+                    M.toast({html: '移除成功', classes: 'rounded'});
                     showGroupMembers(window.currentGroupId);
                     location.reload();
                 } else {
-                    alert(data.message);
+                    M.toast({html: data.message, classes: 'rounded red'});
                 }
             });
         }
 
         function refreshUserList() {
             fetch('/users/api/')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('网络响应不正常');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     const tbody = document.getElementById('userTableBody');
                     tbody.innerHTML = '';
@@ -658,24 +690,24 @@
                             <td>${user.email || '-'}</td>
                             <td>${user.group_name || '无'}</td>
                             <td>
-                                ${user.is_active ? 
-                                    '<span class="badge bg-success">正常</span>' : 
-                                    '<span class="badge bg-danger">禁用</span>'}
+                                <span class="badge ${user.is_active ? 'active' : 'inactive'}">
+                                    ${user.is_active ? '正常' : '禁用'}
+                                </span>
                             </td>
                             <td>
                                 {% if perms.auth.change_user %}
-                                <button class="btn btn-sm btn-outline-primary me-1" onclick="showEditUserModal(${user.id})">
-                                    编辑
-                                </button>
-                                <button class="btn btn-sm btn-outline-warning me-1" onclick="showChangePasswordModal(${user.id})">
-                                    修改密码
-                                </button>
+                                <a class="waves-effect waves-light btn-small" onclick="showEditUserModal(${user.id|escapejs})">
+                                    <i class="material-icons">edit</i>
+                                </a>
+                                <a class="waves-effect waves-light btn-small orange" onclick="showChangePasswordModal(${user.id|escapejs})">
+                                    <i class="material-icons">lock</i>
+                                </a>
                                 {% endif %}
                                 {% if perms.auth.delete_user %}
                                 ${user.id != {{ request.user.id }} ? 
-                                    `<button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${user.id})">
-                                        删除
-                                    </button>` : ''}
+                                    `<a class="waves-effect waves-light btn-small red" onclick="deleteUser(${user.id|escapejs})">
+                                        <i class="material-icons">delete</i>
+                                    </a>` : ''}
                                 {% endif %}
                             </td>
                         `;
@@ -684,7 +716,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('刷新列表失败，请稍后重试');
+                    M.toast({html: '刷新列表失败，请稍后重试', classes: 'rounded red'});
                 });
         }
     </script>
