@@ -5,86 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
     {% load static %}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Materialize CSS 替换 Bootstrap -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body {
-            height: 100vh;
+            /* 添加渐变背景 */
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+            font-family: 'Arial', sans-serif; /* 更新字体 */
+            position: relative;
+            overflow: hidden;
+            display: flex; /* 使用 Flexbox */
+            justify-content: center; /* 水平居中 */
+            align-items: center; /* 垂直居中 */
+            height: 100vh; /* 使 body 高度为视口高度 */
+        }
+        /* 添加动态背景元素 */
+        body::after {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.15) 50%);
+            animation: bgFlow 20s linear infinite;
+            z-index: -1;
+        }
+        .login-card {
+            /* 增强卡片立体感 */
+            max-width: 400px; /* 设置最大宽度 */
+            margin: auto; /* 居中对齐 */
+            box-shadow: none; /* 去掉阴影 */
+            border-radius: 8px; /* 圆角 */
+            backdrop-filter: none; /* 去掉背景模糊 */
+            border: 1px solid rgba(0,0,0,0.1); /* 更简约的边框 */
+            padding: 2rem; /* 增加内边距 */
+            transition: none; /* 去掉过渡效果 */
+        }
+        .input-field {
+            margin-bottom: 1.5rem; /* 增加输入框之间的间距 */
+        }
+        .input-field input {
+            border: 1px solid #ccc; /* 边框 */
+            border-radius: 4px; /* 圆角 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 阴影 */
+            padding: 0.5rem; /* 增加内边距 */
+        }
+        .input-field input:focus {
+            border-color: #6a11cb; /* 聚焦时边框颜色 */
+            box-shadow: 0 0 5px rgba(106, 17, 203, 0.5); /* 聚焦时阴影 */
+        }
+        .input-field label {
+            color: #6a11cb; /* 标签颜色 */
+        }
+        .btn {
+            width: 100%; /* 按钮宽度填满 */
+            background: #4CAF50; /* 使用单一颜色 */
+            color: white; /* 按钮文字颜色 */
+            border: none; /* 去掉边框 */
+            border-radius: 4px; /* 圆角 */
+            padding: 0.75rem; /* 增加内边距 */
+            font-size: 1rem; /* 字体大小 */
+            transition: background 0.3s ease; /* 平滑过渡 */
+        }
+        .btn:hover {
+            background: #45a049; /* 悬停时颜色变化 */
+            box-shadow: none; /* 去掉悬停阴影 */
+        }
+        .card-panel.red {
+            /* 增强错误提示 */
+            background: rgba(255, 235, 238, 0.9) !important;
+            border: 2px solid #ff1744;
             display: flex;
             align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        .form-signin {
-            max-width: 400px;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-        .form-signin .form-floating:focus-within {
-            z-index: 2;
-        }
-        .form-signin input[type="text"] {
-            margin-bottom: -1px;
-            border-bottom-right-radius: 0;
-            border-bottom-left-radius: 0;
-        }
-        .form-signin input[type="password"] {
-            margin-bottom: 10px;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-        }
-        .btn-primary {
-            background: linear-gradient(to right, #667eea, #764ba2);
-            border: none;
-            padding: 12px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        .alert-info {
-            background: rgba(102, 126, 234, 0.1);
-            border: none;
-            color: #667eea;
-        }
-        .form-check-input:checked {
-            background-color: #667eea;
-            border-color: #667eea;
+        @keyframes bgFlow {
+            0% { transform: rotate(0deg) translate(-25%, -25%); }
+            100% { transform: rotate(360deg) translate(-25%, -25%); }
         }
     </style>
 </head>
-<body class="text-center">
-    <main class="form-signin w-100 m-auto">
-        <form method="post">
+<body>
+    <main class="container">
+        <form method="post" action="{% url 'demo:login' %}" class="card login-card">
             {% csrf_token %}
-            <h1 class="h3 mb-4 fw-normal text-primary">Django演示系统</h1>
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="username" name="username" placeholder="用户名">
-                <label for="username">用户名</label>
+            <div class="card-content">
+                <span class="card-title deep-purple-text text-darken-2" style="font-size: 2rem; font-weight: 500; margin-bottom: 2rem;">
+                    <i class="material-icons medium" style="vertical-align: middle">fingerprint</i>
+                    Django演示系统
+                </span>
+                
+                <!-- 在错误提示区域添加图标 -->
+                {% if messages %}
+                <div class="card-panel red" style="margin-bottom: 1.5rem;">
+                    <i class="material-icons" style="margin-right: 1rem">error</i>
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div class="input-field">
+                    <input type="text" id="username" name="username" class="validate">
+                    <label for="username">用户名</label>
+                </div>
+                
+                <div class="input-field">
+                    <input type="password" id="password" name="password" class="validate">
+                    <label for="password">密码</label>
+                </div>
+                
+                <p class="left-align">
+                    <label>
+                        <input type="checkbox" class="filled-in" id="rememberMe"/>
+                        <span>记住我</span>
+                    </label>
+                </p>
+                
+                <button class="btn" type="submit" style="display: flex; align-items: center; justify-content: center; margin-top: 1rem;">
+                    <i class="material-icons" style="margin-right: 0.5rem;">send</i>
+                    登录
+                </button>
+                
+                <div class="row" style="margin-top: 1rem;">
+                    <div class="col s12">
+                        <p class="left-align">还没有账号？ 
+                            <a href="{% url 'demo:register' %}" class="indigo-text">立即注册</a>
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="password" name="password" placeholder="密码">
-                <label for="password">密码</label>
+            
+            <div class="card-action">
+                <span class="grey-text text-darken-1 small">powered by KTO © 2025</span>
             </div>
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" value="remember-me" id="rememberMe">
-                <label class="form-check-label" for="rememberMe">记住我</label>
-            </div>
-            <button class="w-100 btn btn-lg btn-primary mb-4" type="submit">登录</button>
-            {% if messages %}
-            <div class="alert alert-danger mt-3">
-                {% for message in messages %}
-                    {{ message }}
-                {% endfor %}
-            </div>
-            {% endif %}
-            <p class="mt-3">还没有账号？ <a href="{% url 'demo:register' %}">立即注册</a></p>
-            <p class="mb-3 text-muted small">powered by KTO © 2025</p>
         </form>
     </main>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Materialize JS 替换 Bootstrap -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            M.AutoInit();
+        });
+    </script>
 </body>
 </html>
