@@ -6,16 +6,15 @@ from django.views.generic import RedirectView
 app_name = 'demo'
 
 urlpatterns = [
-
     path('init/<str:password>/', views.init_system, name='init_system'),
-    path('init/<str:password>', RedirectView.as_view(permanent=True, pattern_name='demo:init_system'), name='init_system_redirect'),
     
     path('', views.home, name='home'),
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
     path('logout/', LogoutView.as_view(next_page='demo:login', template_name='demo/login.html'), name='logout'),
     
-
+    # API endpoints
+    path('users/api/', views.users_api, name='users_api'),
     path('users/', views.user_list, name='user_list'),
     path('users/create/', views.user_create, name='user_create'),
     path('users/<int:user_id>/', views.user_detail_api, name='user_detail_api'),
