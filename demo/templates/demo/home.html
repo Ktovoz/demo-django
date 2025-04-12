@@ -11,42 +11,85 @@
     <style>
         body {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
-            font-family: 'Arial', sans-serif;
+            font-family: 'Roboto', 'Arial', sans-serif;
             min-height: 100vh;
             display: flex;
+            margin: 0;
+            color: #333;
+            transition: all 0.3s ease;
         }
 
         nav.sidebar {
-            width: 250px;
-            background: rgba(255, 255, 255, 0.9);
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
             height: 100vh;
-            padding: 15px;
+            padding: 20px 15px;
             position: fixed;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            box-shadow: 3px 0 15px rgba(0,0,0,0.15);
             overflow-y: auto;
             z-index: 1000;
+            transition: all 0.3s ease;
+            border-right: 1px solid rgba(0,0,0,0.05);
         }
 
         main {
             flex: 1;
-            padding: 20px;
-            margin-left: 300px;
+            padding: 30px;
+            margin-left: 330px;
+            transition: all 0.3s ease;
+        }
+        
+        @media (max-width: 992px) {
+            nav.sidebar {
+                transform: translateX(-100%);
+                box-shadow: none;
+            }
+            
+            nav.sidebar.active {
+                transform: translateX(0);
+                box-shadow: 3px 0 15px rgba(0,0,0,0.15);
+            }
+            
+            main {
+                margin-left: 0;
+            }
         }
 
         .content-card {
             background: rgba(255, 255, 255, 0.97);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
         }
 
         .user-info {
-            padding: 20px;
-            border-radius: 12px;
+            padding: 25px;
+            border-radius: 15px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .user-info::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            z-index: 0;
         }
 
         .collection {
@@ -98,59 +141,300 @@
         .btn-floating {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
         }
 
         .btn-floating:hover {
             background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-            transform: scale(1.05);
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+        }
+        
+        .btn, .btn-small {
+            border-radius: 30px;
+            text-transform: none;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn:hover, .btn-small:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .btn i, .btn-small i {
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:hover i, .btn-small:hover i {
+            transform: translateX(3px);
         }
 
         .modal {
-            border-radius: 8px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            width: 50%;
+            max-height: 85%;
+            max-width: 650px;
+        }
+        
+        @media (max-width: 992px) {
+            .modal {
+                width: 80%;
+                max-width: none;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .modal {
+                width: 95%;
+                height: auto !important;
+            }
+        }
+        
+        .modal.open {
+            transform: scale(1);
+            opacity: 1;
         }
 
         .modal .modal-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 15px;
-            border-radius: 8px 8px 0 0;
+            padding: 20px 25px;
+            border-radius: 12px 12px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .modal .modal-header:after {
+            content: '';
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        
+        .modal .modal-header h5 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal .modal-content {
+            padding: 30px 35px 20px;
+            overflow-y: auto;
+            max-height: calc(100% - 130px);
+        }
+        
+        .modal .input-field {
+            margin-bottom: 25px;
+        }
+        
+        .modal .input-field input:focus,
+        .modal .input-field select:focus {
+            border-bottom: 2px solid #667eea !important;
+            box-shadow: 0 1px 0 0 #667eea !important;
+        }
+        
+        .modal .input-field label.active {
+            color: #667eea !important;
         }
 
         .modal .modal-footer {
-            background-color: #f5f5f5;
-            border-radius: 0 0 8px 8px;
+            background-color: rgba(245, 245, 245, 0.7);
+            border-radius: 0 0 12px 12px;
+            padding: 16px 25px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .modal .modal-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 30px;
+            padding: 0 25px;
+            height: 36px;
+            line-height: 36px;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .modal .modal-close:hover {
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.6);
+            transform: translateY(-2px);
         }
 
         .badge {
-            border-radius: 12px;
-            padding: 3px 10px;
+            border-radius: 30px;
+            padding: 5px 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 70px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
         }
 
         .badge.active {
             background-color: #4CAF50;
             color: white;
         }
+        
+        .badge.active:before {
+            content: '\25cf';
+            margin-right: 5px;
+            font-size: 10px;
+        }
 
         .badge.inactive {
             background-color: #f44336;
             color: white;
         }
+        
+        .badge.inactive:before {
+            content: '\25cb';
+            margin-right: 5px;
+            font-size: 10px;
+        }
 
+        table {
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+        
+        table.highlight > tbody > tr {
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+        
+        table.highlight > tbody > tr td {
+            padding: 15px 10px;
+            border: none;
+        }
+        
+        table.highlight > tbody > tr td:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+        
+        table.highlight > tbody > tr td:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+        
         table.highlight > tbody > tr:hover {
-            background-color: rgba(102, 126, 234, 0.1);
+            background-color: rgba(102, 126, 234, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        /* 操作提示样式 */
+        .required-field label:after {
+            content: ' *';
+            color: #F44336;
+        }
+        
+        .action-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            padding: 15px 20px;
+            max-width: 300px;
+            z-index: 1000;
+            font-size: 14px;
+            color: #555;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            backdrop-filter: blur(5px);
+            display: none;
+        }
+        
+        .action-hint.show {
+            transform: translateY(0);
+            opacity: 1;
+            display: block;
+        }
+        
+        .action-hint .close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.5;
+        }
+        
+        .action-hint .close:hover {
+            opacity: 1;
+        }
+        
+        /* 移动端菜单按钮样式 */
+        .mobile-menu-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1010;
+            background: rgba(255, 255, 255, 0.95);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .mobile-menu-btn.active {
+            transform: rotate(90deg);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .mobile-menu-btn i {
+            font-size: 24px;
         }
     </style>
 </head>
 <body>
+    <!-- 移动设备菜单按钮 -->
+    <div class="mobile-menu-btn hide-on-large-only" id="menuToggle">
+        <i class="material-icons">menu</i>
+    </div>
+    
     <!-- 侧边栏 -->
-    <nav class="sidebar">
+    <nav class="sidebar" id="sideNav">
         <div class="user-info">
-            <div class="row mb-0">
-                <div class="col s8">
-                    <h6 class="white-text" style="margin: 0 0 5px 0; font-size: 1.2rem;">{{ user.username }}</h6>
-                    <span class="white-text" style="opacity: 0.8; font-size: 0.9rem;">{{ user.groups.all.0.name|default:"无用户组" }}</span>
+            <div class="row mb-0" style="margin-bottom: 0;">
+                <div class="col s8" style="padding: 0 0.5rem;">
+                    <h6 class="white-text" style="margin: 0 0 8px 0; font-size: 1.2rem; line-height: 1.2;">{{ user.username }}</h6>
+                    <div class="white-text" style="opacity: 0.8; font-size: 0.9rem; margin-bottom: 6px; line-height: 1.2;">{{ user.groups.all.0.name|default:"无用户组" }}</div>
+                    <div class="user-login-time white-text" style="opacity: 0.6; font-size: 0.8rem; line-height: 1.2; display: flex; align-items: center;">
+                        <i class="material-icons tiny" style="font-size: 14px; margin-right: 4px;">access_time</i>
+                        <span>最近登录: {{ user.last_login|date:"Y-m-d H:i" }}</span>
+                    </div>
                 </div>
-                <div class="col s4 right-align">
+                <div class="col s4" style="padding: 0 0.5rem; text-align: right;">
                     <form method="post" action="{% url 'demo:logout' %}" style="margin: 0;">
                         {% csrf_token %}
                         <button class="btn-floating waves-effect waves-light" style="background: transparent; box-shadow: none;">
@@ -174,6 +458,12 @@
 
     <!-- 主要内容区 -->
     <main>
+        <!-- 操作提示 -->
+        <div class="action-hint" id="actionHint">
+            <span class="close" onclick="closeHint()">&times;</span>
+            <p id="hintContent"></p>
+        </div>
+        
         <!-- 用户列表视图 -->
         <div class="content-card" id="userListView">
             <div class="row">
@@ -204,7 +494,7 @@
                 </thead>
                 <tbody id="userTableBody">
                     {% for user in users %}
-                    <tr>
+                    <tr data-user-id="{{ user.id }}">
                         <td>{{ user.username }}</td>
                         <td>{{ user.email|default:"-" }}</td>
                         <td>{{ user.groups.all.0.name|default:"无" }}</td>
@@ -379,22 +669,58 @@
             {% endif %}
         </div>
         <div class="modal-footer">
-            <a class="modal-close waves-effect waves-light btn-flat">关闭</a>
+            <a class="modal-close waves-effect waves-light">取消</a>
+            <a class="waves-effect waves-light btn save-btn" onclick="saveUser()">保存</a>
         </div>
     </div>
 
     <!-- Materialize JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
+        // 预先定义所有Django变量
         const currentUserId = {{ request.user.id }};
-        const currentUserGroup = '{{ user.groups.all.0.name }}';
-        const currentUserName = '{{ user.username }}';
+        const currentUserGroup = '{{ user.groups.all.0.name|escapejs }}';
+        const currentUserName = '{{ user.username|escapejs }}';
+        // 权限变量
+        const hasChangeUserPerm = {% if perms.auth.change_user %}true{% else %}false{% endif %};
+        const hasDeleteUserPerm = {% if perms.auth.delete_user %}true{% else %}false{% endif %};
 
         // 初始化 Materialize 组件
         document.addEventListener('DOMContentLoaded', function() {
             M.AutoInit();
             var elems = document.querySelectorAll('.modal');
             var instances = M.Modal.init(elems);
+            
+            // 触发表格行悬停效果
+            document.querySelectorAll('tbody tr').forEach(tr => {
+                tr.addEventListener('mouseenter', function() {
+                    this.classList.add('hovered');
+                });
+                tr.addEventListener('mouseleave', function() {
+                    this.classList.remove('hovered');
+                });
+            });
+            
+            // 为移动端菜单按钮添加点击事件
+            const menuToggle = document.getElementById('menuToggle');
+            const sideNav = document.getElementById('sideNav');
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    sideNav.classList.toggle('active');
+                    menuToggle.classList.toggle('active');
+                });
+            }
+            
+            // 点击内容区域关闭菜单（仅在移动端）
+            const main = document.querySelector('main');
+            if (main && window.innerWidth < 992) {
+                main.addEventListener('click', function() {
+                    sideNav.classList.remove('active');
+                    if (menuToggle) {
+                        menuToggle.classList.remove('active');
+                    }
+                });
+            }
             
             var selects = document.querySelectorAll('select');
             var selectInstances = M.FormSelect.init(selects);
@@ -406,6 +732,11 @@
             document.getElementById('groupListView').style.display = 'none';
             // 更新侧边栏选中状态
             updateMenuActiveState(element);
+            // 移动端自动关闭侧边栏
+            if (window.innerWidth < 992) {
+                document.getElementById('sideNav').classList.remove('active');
+                document.getElementById('menuToggle').classList.remove('active');
+            }
         }
 
         function showGroupList(element) {
@@ -413,12 +744,41 @@
             document.getElementById('groupListView').style.display = 'block';
             // 更新侧边栏选中状态
             updateMenuActiveState(element);
+            // 移动端自动关闭侧边栏
+            if (window.innerWidth < 992) {
+                document.getElementById('sideNav').classList.remove('active');
+                document.getElementById('menuToggle').classList.remove('active');
+            }
         }
 
         // 页面加载时默认显示用户列表
         document.addEventListener('DOMContentLoaded', function() {
             showUserList(document.querySelector('.collection-item[data-view="userListView"]'));
+            
+            // 如果是首次访问，显示操作提示
+            if (!localStorage.getItem('hasVisitedBefore')) {
+                setTimeout(() => {
+                    showHint('欢迎使用系统！点击侧边栏菜单项可切换不同功能界面。');
+                    localStorage.setItem('hasVisitedBefore', 'true');
+                }, 1000);
+            }
         });
+        
+        // 提示操作函数
+        function showHint(message) {
+            const hintEl = document.getElementById('actionHint');
+            document.getElementById('hintContent').textContent = message;
+            hintEl.classList.add('show');
+            
+            // 5秒后自动隐藏
+            setTimeout(() => {
+                closeHint();
+            }, 5000);
+        }
+        
+        function closeHint() {
+            document.getElementById('actionHint').classList.remove('show');
+        }
 
         function updateMenuActiveState(element) {
             // 移除所有菜单项的active类
@@ -436,11 +796,24 @@
             document.getElementById('userModalTitle').textContent = '新增用户';
             document.getElementById('userForm').reset();
             document.getElementById('userId').value = '';
+            // 显示密码字段并添加必填标记
+            document.getElementById('password').setAttribute('required', 'required');
+            document.getElementById('passwordGroup').classList.add('required-field');
+            // 重新初始化表单字段
+            M.updateTextFields();
+            M.FormSelect.init(document.getElementById('userGroup'));
             M.Modal.getInstance(document.getElementById('userModal')).open();
+            // 聚焦到第一个输入框
+            setTimeout(() => {
+                document.getElementById('username').focus();
+            }, 300);
         }
 
         function showEditUserModal(userId) {
             document.getElementById('userModalTitle').textContent = '编辑用户';
+            // 显示加载提示
+            M.toast({html: '正在加载用户信息...', classes: 'rounded blue'});
+            
             fetch(`/users/${userId}/`)
                 .then(response => response.json())
                 .then(data => {
@@ -449,9 +822,17 @@
                     document.getElementById('email').value = data.email || '';
                     document.getElementById('userGroup').value = data.group_id || '';
                     document.getElementById('isActive').checked = data.is_active;
+                    // 编辑时密码非必填
+                    document.getElementById('password').removeAttribute('required');
+                    document.getElementById('passwordGroup').classList.remove('required-field');
+                    
                     M.updateTextFields();
                     M.FormSelect.init(document.getElementById('userGroup'));
                     M.Modal.getInstance(document.getElementById('userModal')).open();
+                })
+                .catch(error => {
+                    M.toast({html: '加载用户信息失败', classes: 'rounded red'});
+                    console.error('错误:', error);
                 });
         }
 
@@ -483,7 +864,10 @@
                 if (data.status === 'success') {
                     M.Modal.getInstance(document.getElementById('userModal')).close();
                     M.toast({html: '操作成功', classes: 'rounded'});
-                    location.reload();
+                    showHint(userId ? '用户信息已更新成功' : '新用户创建成功');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
                 } else {
                     M.toast({html: data.message, classes: 'rounded red'});
                 }
@@ -491,7 +875,11 @@
         }
 
         function deleteUser(userId) {
-            if (!confirm('确定要删除该用户吗？')) return;
+            // 使用更友好的确认框
+            const userRow = document.querySelector(`tr[data-user-id="${userId}"]`);
+            const username = userRow ? userRow.querySelector('td:first-child').textContent : '该用户';
+            
+            if (!confirm(`确定要删除用户【${username}】吗？此操作不可恢复！`)) return;
 
             fetch(`/users/${userId}/delete/`, {
                 method: 'POST',
@@ -503,7 +891,10 @@
             .then(data => {
                 if (data.status === 'success') {
                     M.toast({html: '删除成功', classes: 'rounded'});
-                    location.reload();
+                    showHint('用户已成功删除');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
                 } else {
                     M.toast({html: data.message, classes: 'rounded red'});
                 }
@@ -685,6 +1076,24 @@
                     
                     data.users.forEach(user => {
                         const tr = document.createElement('tr');
+                        let btnHtml = '';
+                        
+                        // 基于预定义的权限变量构建操作按钮
+                        if (hasChangeUserPerm) {
+                            btnHtml += `<a class="waves-effect waves-light btn-small" onclick="showEditUserModal(${user.id})">
+                                <i class="material-icons">edit</i>
+                            </a>
+                            <a class="waves-effect waves-light btn-small orange" onclick="showChangePasswordModal(${user.id})">
+                                <i class="material-icons">lock</i>
+                            </a>`;
+                        }
+                        
+                        if (hasDeleteUserPerm && user.id != currentUserId) {
+                            btnHtml += `<a class="waves-effect waves-light btn-small red" onclick="deleteUser(${user.id})">
+                                <i class="material-icons">delete</i>
+                            </a>`;
+                        }
+                        
                         tr.innerHTML = `
                             <td>${user.username}</td>
                             <td>${user.email || '-'}</td>
@@ -694,22 +1103,7 @@
                                     ${user.is_active ? '正常' : '禁用'}
                                 </span>
                             </td>
-                            <td>
-                                {% if perms.auth.change_user %}
-                                <a class="waves-effect waves-light btn-small" onclick="showEditUserModal(${user.id|escapejs})">
-                                    <i class="material-icons">edit</i>
-                                </a>
-                                <a class="waves-effect waves-light btn-small orange" onclick="showChangePasswordModal(${user.id|escapejs})">
-                                    <i class="material-icons">lock</i>
-                                </a>
-                                {% endif %}
-                                {% if perms.auth.delete_user %}
-                                ${user.id != {{ request.user.id }} ? 
-                                    `<a class="waves-effect waves-light btn-small red" onclick="deleteUser(${user.id|escapejs})">
-                                        <i class="material-icons">delete</i>
-                                    </a>` : ''}
-                                {% endif %}
-                            </td>
+                            <td>${btnHtml}</td>
                         `;
                         tbody.appendChild(tr);
                     });

@@ -4,106 +4,138 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>用户注册</title>
+    {% load static %}
     <!-- Materialize CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body {
-            /* 使用与登录页面相同的背景样式 */
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8)); /* 保持与登录框一致 */
+            /* 添加渐变背景 */
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+            font-family: 'Arial', sans-serif;
+            position: relative;
+            overflow: hidden;
             display: flex;
-            min-height: 100vh;
-            flex-direction: column;
-            justify-content: center; /* 垂直居中 */
-            align-items: center; /* 水平居中 */
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        .card {
-            max-width: 500px; /* 增加卡片的最大宽度 */
-            padding: 2rem; /* 保持与登录框一致 */
-            margin: 20px; /* 增加外边距 */
-            border-radius: 8px; /* 确保与登录框一致 */
-            border: 1px solid rgba(0,0,0,0.1); /* 确保与登录框一致 */
-            box-shadow: none; /* 确保与登录框一致 */
+        /* 添加动态背景元素 */
+        body::after {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.15) 50%);
+            animation: bgFlow 20s linear infinite;
+            z-index: -1;
         }
-        .btn {
-            width: 100%; /* 确保与登录框一致 */
-            background: #4CAF50; /* 确保与登录框一致 */
-            color: white; /* 确保与登录框一致 */
-            border: none; /* 确保与登录框一致 */
-            border-radius: 4px; /* 确保与登录框一致 */
-            padding: 0.75rem; /* 确保与登录框一致 */
-            font-size: 1rem; /* 确保与登录框一致 */
-            transition: background 0.3s ease; /* 确保与登录框一致 */
-            display: flex; /* 确保与登录框一致 */
-            align-items: center; /* 确保与登录框一致 */
-            justify-content: center; /* 确保与登录框一致 */
-            margin-top: 1rem; /* 增加按钮与输入字段之间的间距 */
-        }
-        .btn:hover {
-            background: #45a049;
+        .login-card {
+            max-width: 400px;
+            margin: auto;
+            box-shadow: none;
+            border-radius: 8px;
+            backdrop-filter: none;
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 2rem;
+            transition: none;
         }
         .input-field {
-            margin-bottom: 1.5rem; /* 增加输入字段之间的间距 */
+            margin-bottom: 1.5rem;
         }
         .input-field input {
-            border: 1px solid #ccc; /* 确保与登录框一致 */
-            border-radius: 4px; /* 确保与登录框一致 */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 确保与登录框一致 */
-            padding: 0.5rem; /* 确保与登录框一致 */
-            width: 100%; /* 确保与登录框一致 */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0.5rem;
         }
         .input-field input:focus {
             border-color: #6a11cb;
             box-shadow: 0 0 5px rgba(106, 17, 203, 0.5);
         }
         .input-field label {
-            color: #6a11cb; /* 确保与登录框一致 */
+            color: #6a11cb;
+        }
+        .btn {
+            width: 100%;
+            background: #6a11cb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.75rem;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #4a0d9b;
+            box-shadow: none;
+        }
+        .card-panel.red {
+            background: rgba(255, 235, 238, 0.9) !important;
+            border: 2px solid #ff1744;
+            display: flex;
+            align-items: center;
+        }
+        @keyframes bgFlow {
+            0% { transform: rotate(0deg) translate(-25%, -25%); }
+            100% { transform: rotate(360deg) translate(-25%, -25%); }
         }
     </style>
 </head>
 <body>
-    <main>
-        <div class="card">
-            <form method="post">
-                {% csrf_token %}
-                <h4 class="center-align deep-purple-text">用户注册</h4>
+    <main class="container">
+        <form method="post" class="card login-card">
+            {% csrf_token %}
+            <div class="card-content">
+                <span class="card-title deep-purple-text text-darken-2" style="font-size: 2rem; font-weight: 500; margin-bottom: 2rem;">
+                    <i class="material-icons medium" style="vertical-align: middle">app_registration</i>
+                    用户注册
+                </span>
                 
-                <div class="input-field">
-                    <i class="material-icons prefix">account_circle</i>
-                    <input id="username" name="username" type="text" class="validate" required>
-                    <label for="username">用户名</label>
-                </div>
-                
-                <div class="input-field">
-                    <i class="material-icons prefix">lock</i>
-                    <input id="password1" name="password1" type="password" class="validate" required>
-                    <label for="password1">密码</label>
-                </div>
-                
-                <div class="input-field">
-                    <i class="material-icons prefix">lock_outline</i>
-                    <input id="password2" name="password2" type="password" class="validate" required>
-                    <label for="password2">确认密码</label>
-                </div>
-                
-                <button class="btn waves-effect waves-light" type="submit">注册
-                    <i class="material-icons right">send</i>
-                </button>
-                
+                <!-- 在错误提示区域添加图标 -->
                 {% if messages %}
-                <div class="card-panel red lighten-4 red-text">
+                <div class="card-panel red" style="margin-bottom: 1.5rem;">
+                    <i class="material-icons" style="margin-right: 1rem">error</i>
                     {% for message in messages %}
                         {{ message }}
                     {% endfor %}
                 </div>
                 {% endif %}
                 
-                <p class="center-align">已有账号？ <a href="{% url 'demo:login' %}">立即登录</a></p>
-                <p class="center-align grey-text">Django演示系统</p>
-                <p class="center-align grey-text small">powered by KTO © 2025</p>
-            </form>
-        </div>
+                <div class="input-field">
+                    <input id="username" name="username" type="text" class="validate" required>
+                    <label for="username">用户名</label>
+                </div>
+                
+                <div class="input-field">
+                    <input id="password1" name="password1" type="password" class="validate" required>
+                    <label for="password1">密码</label>
+                </div>
+                
+                <div class="input-field">
+                    <input id="password2" name="password2" type="password" class="validate" required>
+                    <label for="password2">确认密码</label>
+                </div>
+                
+                <button class="btn" type="submit" style="display: flex; align-items: center; justify-content: center; margin-top: 1rem;">
+                    <i class="material-icons" style="margin-right: 0.5rem;">send</i>
+                    注册
+                </button>
+                
+                <div class="row" style="margin-top: 1rem;">
+                    <div class="col s12">
+                        <p class="left-align">已有账号？
+                            <a href="{% url 'demo:login' %}" class="indigo-text">立即登录</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-action">
+                <span class="grey-text text-darken-1 small">powered by KTO © 2025</span>
+            </div>
+        </form>
     </main>
     
     <!-- Materialize JavaScript -->
