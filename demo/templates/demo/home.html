@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
-    <!-- Materialize CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body {
@@ -342,7 +340,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
         
-        /* 操作提示样式 */
         .required-field label:after {
             content: ' *';
             color: #F44336;
@@ -417,12 +414,11 @@
     </style>
 </head>
 <body>
-    <!-- 移动设备菜单按钮 -->
+
     <div class="mobile-menu-btn hide-on-large-only" id="menuToggle">
         <i class="material-icons">menu</i>
     </div>
     
-    <!-- 侧边栏 -->
     <nav class="sidebar" id="sideNav">
         <div class="user-info">
             <div class="row mb-0" style="margin-bottom: 0;">
@@ -456,15 +452,14 @@
         </ul>
     </nav>
 
-    <!-- 主要内容区 -->
     <main>
-        <!-- 操作提示 -->
+     
         <div class="action-hint" id="actionHint">
             <span class="close" onclick="closeHint()">&times;</span>
             <p id="hintContent"></p>
         </div>
         
-        <!-- 用户列表视图 -->
+
         <div class="content-card" id="userListView">
             <div class="row">
                 <div class="col s6">
@@ -526,7 +521,6 @@
             </table>
         </div>
 
-        <!-- 用户组列表视图 -->
         <div class="content-card d-none" id="groupListView">
             <div class="row">
                 <div class="col s12">
@@ -559,7 +553,6 @@
         </div>
     </main>
 
-    <!-- 用户编辑模态框 -->
     <div id="userModal" class="modal">
         <div class="modal-header">
             <h5 id="userModalTitle">编辑用户</h5>
@@ -606,7 +599,6 @@
         </div>
     </div>
 
-    <!-- 修改密码模态框 -->
     <div id="passwordModal" class="modal">
         <div class="modal-header">
             <h5 id="passwordModalTitle">修改密码</h5>
@@ -633,7 +625,6 @@
         </div>
     </div>
 
-    <!-- 用户组成员模态框 -->
     <div id="groupMembersModal" class="modal modal-fixed-footer">
         <div class="modal-header">
             <h5 id="groupMembersModalTitle">用户组成员</h5>
@@ -674,24 +665,24 @@
         </div>
     </div>
 
-    <!-- Materialize JS -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
-        // 预先定义所有Django变量
+
         const currentUserId = {{ request.user.id }};
         const currentUserGroup = '{{ user.groups.all.0.name|escapejs }}';
         const currentUserName = '{{ user.username|escapejs }}';
-        // 权限变量
+       
         const hasChangeUserPerm = {% if perms.auth.change_user %}true{% else %}false{% endif %};
         const hasDeleteUserPerm = {% if perms.auth.delete_user %}true{% else %}false{% endif %};
 
-        // 初始化 Materialize 组件
+        
         document.addEventListener('DOMContentLoaded', function() {
             M.AutoInit();
             var elems = document.querySelectorAll('.modal');
             var instances = M.Modal.init(elems);
             
-            // 触发表格行悬停效果
+           
             document.querySelectorAll('tbody tr').forEach(tr => {
                 tr.addEventListener('mouseenter', function() {
                     this.classList.add('hovered');
@@ -701,7 +692,7 @@
                 });
             });
             
-            // 为移动端菜单按钮添加点击事件
+           
             const menuToggle = document.getElementById('menuToggle');
             const sideNav = document.getElementById('sideNav');
             if (menuToggle) {
@@ -711,7 +702,7 @@
                 });
             }
             
-            // 点击内容区域关闭菜单（仅在移动端）
+            
             const main = document.querySelector('main');
             if (main && window.innerWidth < 992) {
                 main.addEventListener('click', function() {
@@ -726,13 +717,13 @@
             var selectInstances = M.FormSelect.init(selects);
         });
 
-        // 视图切换
+       
         function showUserList(element) {
             document.getElementById('userListView').style.display = 'block';
             document.getElementById('groupListView').style.display = 'none';
-            // 更新侧边栏选中状态
+            
             updateMenuActiveState(element);
-            // 移动端自动关闭侧边栏
+          
             if (window.innerWidth < 992) {
                 document.getElementById('sideNav').classList.remove('active');
                 document.getElementById('menuToggle').classList.remove('active');
@@ -742,20 +733,20 @@
         function showGroupList(element) {
             document.getElementById('userListView').style.display = 'none';
             document.getElementById('groupListView').style.display = 'block';
-            // 更新侧边栏选中状态
+         
             updateMenuActiveState(element);
-            // 移动端自动关闭侧边栏
+         
             if (window.innerWidth < 992) {
                 document.getElementById('sideNav').classList.remove('active');
                 document.getElementById('menuToggle').classList.remove('active');
             }
         }
 
-        // 页面加载时默认显示用户列表
+       
         document.addEventListener('DOMContentLoaded', function() {
             showUserList(document.querySelector('.collection-item[data-view="userListView"]'));
             
-            // 如果是首次访问，显示操作提示
+           
             if (!localStorage.getItem('hasVisitedBefore')) {
                 setTimeout(() => {
                     showHint('欢迎使用系统！点击侧边栏菜单项可切换不同功能界面。');
@@ -764,13 +755,13 @@
             }
         });
         
-        // 提示操作函数
+        
         function showHint(message) {
             const hintEl = document.getElementById('actionHint');
             document.getElementById('hintContent').textContent = message;
             hintEl.classList.add('show');
             
-            // 5秒后自动隐藏
+           
             setTimeout(() => {
                 closeHint();
             }, 5000);
@@ -781,29 +772,29 @@
         }
 
         function updateMenuActiveState(element) {
-            // 移除所有菜单项的active类
+           
             document.querySelectorAll('.collection-item').forEach(item => {
                 item.classList.remove('active');
             });
-            // 添加active类到当前点击的菜单项
+            
             if (element) {
                 element.classList.add('active');
             }
         }
 
-        // 用户相关操作
+      
         function showCreateUserModal() {
             document.getElementById('userModalTitle').textContent = '新增用户';
             document.getElementById('userForm').reset();
             document.getElementById('userId').value = '';
-            // 显示密码字段并添加必填标记
+  
             document.getElementById('password').setAttribute('required', 'required');
             document.getElementById('passwordGroup').classList.add('required-field');
-            // 重新初始化表单字段
+          
             M.updateTextFields();
             M.FormSelect.init(document.getElementById('userGroup'));
             M.Modal.getInstance(document.getElementById('userModal')).open();
-            // 聚焦到第一个输入框
+     
             setTimeout(() => {
                 document.getElementById('username').focus();
             }, 300);
@@ -811,7 +802,7 @@
 
         function showEditUserModal(userId) {
             document.getElementById('userModalTitle').textContent = '编辑用户';
-            // 显示加载提示
+          
             M.toast({html: '正在加载用户信息...', classes: 'rounded blue'});
             
             fetch(`/users/${userId}/`)
@@ -822,7 +813,7 @@
                     document.getElementById('email').value = data.email || '';
                     document.getElementById('userGroup').value = data.group_id || '';
                     document.getElementById('isActive').checked = data.is_active;
-                    // 编辑时密码非必填
+                   
                     document.getElementById('password').removeAttribute('required');
                     document.getElementById('passwordGroup').classList.remove('required-field');
                     
@@ -875,7 +866,7 @@
         }
 
         function deleteUser(userId) {
-            // 使用更友好的确认框
+    
             const userRow = document.querySelector(`tr[data-user-id="${userId}"]`);
             const username = userRow ? userRow.querySelector('td:first-child').textContent : '该用户';
             
@@ -901,7 +892,7 @@
             });
         }
 
-        // 密码相关操作
+      
         function showChangePasswordModal(userId) {
             document.getElementById('passwordUserId').value = userId;
             document.getElementById('passwordForm').reset();
@@ -944,7 +935,7 @@
             });
         }
 
-        // 用户组相关操作
+
         function showGroupMembers(groupId) {
             window.currentGroupId = groupId;
             
@@ -1078,7 +1069,7 @@
                         const tr = document.createElement('tr');
                         let btnHtml = '';
                         
-                        // 基于预定义的权限变量构建操作按钮
+                   
                         if (hasChangeUserPerm) {
                             btnHtml += `<a class="waves-effect waves-light btn-small" onclick="showEditUserModal(${user.id})">
                                 <i class="material-icons">edit</i>
