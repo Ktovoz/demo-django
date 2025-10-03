@@ -1,87 +1,25 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    {% load static %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
-            font-family: 'Arial', sans-serif;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        body::after {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.15) 50%);
-            animation: bgFlow 20s linear infinite;
-            z-index: -1;
-        }
-        .login-card {
-            max-width: 400px;
-            margin: auto;
-            box-shadow: none;
-            border-radius: 8px;
-            backdrop-filter: none;
-            border: 1px solid rgba(0,0,0,0.1);
-            padding: 2rem;
-            transition: none;
-        }
-        .input-field {
-            margin-bottom: 1.5rem;
-        }
-        .input-field input {
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 0.5rem;
-        }
-        .input-field input:focus {
-            border-color: #6a11cb;
-            box-shadow: 0 0 5px rgba(106, 17, 203, 0.5);
-        }
-        .input-field label {
-            color: #6a11cb;
-        }
-        .btn {
-            width: 100%;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 0.75rem;
-            font-size: 1rem;
-            transition: background 0.3s ease;
-        }
-        .btn:hover {
-            background: #45a049;
-            box-shadow: none;
-        }
-        .card-panel.red {
-            background: rgba(255, 235, 238, 0.9) !important;
-            border: 2px solid #ff1744;
-            display: flex;
-            align-items: center;
-        }
-        @keyframes bgFlow {
-            0% { transform: rotate(0deg) translate(-25%, -25%); }
-            100% { transform: rotate(360deg) translate(-25%, -25%); }
-        }
-    </style>
-</head>
-<body>
+{% extends 'demo/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-btn {
+        background: #4CAF50;
+        color: white;
+    }
+    
+    .login-btn:hover {
+        background: #45a049;
+        box-shadow: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<body class="auth-body">
     <main class="container">
-        <form method="post" action="{% url 'demo:login' %}" class="card login-card">
+        <form method="post" action="{% url 'demo:login' %}" class="card auth-card">
             {% csrf_token %}
             <div class="card-content">
                 <span class="card-title deep-purple-text text-darken-2" style="font-size: 2rem; font-weight: 500; margin-bottom: 2rem;">
@@ -90,7 +28,7 @@
                 </span>
                 
                 {% if messages %}
-                <div class="card-panel red" style="margin-bottom: 1.5rem;">
+                <div class="card-panel auth-card-panel-error" style="margin-bottom: 1.5rem;">
                     <i class="material-icons" style="margin-right: 1rem">error</i>
                     {% for message in messages %}
                         {{ message }}
@@ -98,12 +36,12 @@
                 </div>
                 {% endif %}
                 
-                <div class="input-field">
+                <div class="input-field auth-input-field">
                     <input type="text" id="username" name="username" class="validate">
                     <label for="username">用户名</label>
                 </div>
                 
-                <div class="input-field">
+                <div class="input-field auth-input-field">
                     <input type="password" id="password" name="password" class="validate">
                     <label for="password">密码</label>
                 </div>
@@ -115,8 +53,8 @@
                     </label>
                 </p>
                 
-                <button class="btn" type="submit" style="display: flex; align-items: center; justify-content: center; margin-top: 1rem;">
-                    <i class="material-icons" style="margin-right: 0.5rem;">send</i>
+                <button class="btn auth-btn login-btn" type="submit">
+                    <i class="material-icons">send</i>
                     登录
                 </button>
                 
@@ -134,12 +72,5 @@
             </div>
         </form>
     </main>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            M.AutoInit();
-        });
-    </script>
 </body>
-</html>
+{% endblock %}
