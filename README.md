@@ -35,7 +35,7 @@
 #### 💼 业务功能
 - **👥 用户管理**: 完整的用户CRUD操作，支持用户状态管理
 - **🏢 用户组管理**: 用户组的创建、更新和成员管理
-- **🔐 权限控制**: 细粒度的权限管理系统
+- **🔐 认证系统**: 用户注册、登录、登出和用户名可用性检查
 - **⚙️ 系统初始化**: 一键初始化系统数据和配置
 - **🔑 密码管理**: 安全的密码修改和重置功能
 
@@ -48,9 +48,15 @@
 
 #### 🎨 用户体验
 - **📱 响应式设计**: 支持多种设备和屏幕尺寸
-- **🎭 现代UI**: 清新简洁的用户界面
-- **⚡ 快速响应**: 优化的前端性能
+- **🎭 现代UI**: 清新简洁的用户界面，优化的视觉效果
+- **⚡ 实时交互**: 用户名可用性实时检查
 - **🌍 国际化支持**: 完整的中文本地化
+
+#### 🚀 最新功能
+- **🔍 用户名检查**: 实时检查用户名可用性，提供即时反馈
+- **🎨 界面优化**: 重新设计的登录和注册页面，提升用户体验
+- **📊 管理界面**: 增强的用户管理界面，支持更直观的操作
+- **🛡️ 安全增强**: 改进的认证系统和权限验证机制
 
 <hr style="height: 1px; background: #eee;">
 
@@ -129,6 +135,19 @@ Content-Type: application/json
 }
 ```
 
+#### 用户名可用性检查
+```http
+GET /demo/check-username/?username=<username>
+```
+
+**响应示例：**
+```json
+{
+  "available": true,
+  "message": "用户名可用"
+}
+```
+
 #### 用户登出
 ```http
 POST /demo/logout/
@@ -139,6 +158,11 @@ POST /demo/logout/
 #### 获取用户列表
 ```http
 GET /demo/users/
+```
+
+#### 用户API接口
+```http
+GET /demo/users/api/
 ```
 
 #### 创建用户
@@ -189,6 +213,16 @@ Content-Type: application/json
 DELETE /demo/users/<user_id>/delete/
 ```
 
+#### 修改用户组
+```http
+POST /demo/users/<user_id>/change-group/
+Content-Type: application/json
+
+{
+  "group_id": "integer"
+}
+```
+
 #### 获取可分配用户
 ```http
 GET /demo/users/available-for-group/<group_id>/
@@ -204,6 +238,11 @@ GET /demo/groups/
 #### 获取用户组详情
 ```http
 GET /demo/groups/<group_id>/
+```
+
+#### 获取用户组详情API
+```http
+GET /demo/groups/<group_id>/members/
 ```
 
 #### 创建用户组
@@ -231,36 +270,11 @@ Content-Type: application/json
 DELETE /demo/groups/<group_id>/delete/
 ```
 
-#### 获取用户组成员
-```http
-GET /demo/groups/<group_id>/members/
-```
-
-#### 添加用户到组
-```http
-POST /demo/groups/<group_id>/add-member/
-Content-Type: application/json
-
-{
-  "user_id": "integer"
-}
-```
-
-#### 从组中移除用户
-```http
-POST /demo/groups/<group_id>/remove-member/
-Content-Type: application/json
-
-{
-  "user_id": "integer"
-}
-```
-
 ### ⚙️ 系统管理API
 
 #### 系统初始化
 ```http
-POST /demo/init-system/
+POST /demo/init/<password>/
 ```
 
 **初始化内容：**
@@ -268,26 +282,9 @@ POST /demo/init-system/
 - 创建超级管理员账户（admin/admin）
 - 配置基础权限
 
-#### 系统状态检查
+#### 日志测试
 ```http
-GET /demo/system/status/
-```
-
-#### 获取系统信息
-```http
-GET /demo/system/info/
-```
-
-### 📊 统计API
-
-#### 获取用户统计
-```http
-GET /demo/stats/users/
-```
-
-#### 获取用户组统计
-```http
-GET /demo/stats/groups/
+GET /demo/test-logging/
 ```
 
 ### 🔒 权限说明
@@ -322,6 +319,7 @@ django-hub/
 │   ├── logger.py               # Loguru日志配置
 │   ├── views.py                # 视图函数兼容层
 │   ├── urls.py                 # 应用URL路由
+│   ├── tests.py                # 测试文件
 │   ├── api/                    # API接口层
 │   │   ├── __init__.py
 │   │   ├── user_api.py         # 用户相关API
@@ -334,17 +332,23 @@ django-hub/
 │   │   ├── group_views.py      # 用户组管理视图
 │   │   └── system_views.py     # 系统管理视图
 │   ├── migrations/             # 数据库迁移文件
+│   │   └── __init__.py
 │   ├── static/                 # 静态文件资源
 │   │   ├── css/                # 样式文件
 │   │   │   ├── style.css       # 主样式
-│   │   │   ├── user-management.css  # 用户管理样式
-│   │   │   └── register.css    # 注册页面样式
+│   │   │   ├── admin-style.css # 管理后台样式
+│   │   │   ├── login.css       # 登录页面样式
+│   │   │   ├── register.css    # 注册页面样式
+│   │   │   └── user-management.css  # 用户管理样式
 │   │   └── js/                 # JavaScript文件
+│   │       ├── main.js         # 主要JavaScript功能
+│   │       └── user-management.js  # 用户管理交互
 │   └── templates/              # 模板文件
 │       ├── demo/               # 应用模板
 │       │   ├── home.html       # 首页模板
 │       │   ├── login.html      # 登录页面
 │       │   ├── register.html   # 注册页面
+│       │   ├── user_detail.html # 用户详情页面
 │       │   └── user_management.html  # 用户管理页面
 │       └── base.html           # 基础模板
 ├── data/                       # 数据存储目录
@@ -361,8 +365,7 @@ django-hub/
 ├── entrypoint.sh               # 容器启动脚本
 ├── CLAUDE.md                   # Claude Code 开发指南
 ├── CODEBUDDY.md                # 代码助手配置
-├── README.md                   # 项目说明文档
-└── 注册页面样式优化与交互实现.md  # 开发文档
+└── README.md                   # 项目说明文档
 ```
 
 ### 🏗️ 架构设计说明
@@ -473,13 +476,15 @@ cp .env.example .env
 # 运行数据库迁移
 python manage.py migrate
 
-# 创建超级用户账户
-python manage.py createsuperuser
-
-# 初始化系统数据 (可选)
+# 初始化系统 (推荐使用URL方式)
+# 访问 http://localhost:8000/demo/init/admin123/ 来初始化系统
+# 或者使用Django shell
 python manage.py shell
 >>> from demo.views.system_views import init_system
 >>> init_system()
+
+# 创建超级用户账户 (如果未通过初始化创建)
+python manage.py createsuperuser
 ```
 
 #### 6. 启动开发服务器
@@ -489,8 +494,15 @@ python manage.py runserver 0.0.0.0:8000
 
 #### 7. 访问应用
 - **应用首页**: http://localhost:8000/demo/
+- **登录页面**: http://localhost:8000/demo/login/
+- **注册页面**: http://localhost:8000/demo/register/
+- **用户管理**: http://localhost:8000/demo/users/
 - **管理后台**: http://localhost:8000/admin/
-- **API接口**: http://localhost:8000/demo/api/
+- **系统初始化**: http://localhost:8000/demo/init/admin123/
+
+#### 8. 测试功能
+- **日志测试**: http://localhost:8000/demo/test-logging/
+- **用户名检查**: http://localhost:8000/demo/check-username/?username=testuser
 
 ### 🐳 Docker 部署
 
