@@ -170,6 +170,32 @@ body {
     position: relative;
 }
 
+/* 错误信息面板样式 */
+.auth-card-panel-error {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e) !important;
+    border: none;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    padding: 1rem;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    animation: shake 0.5s ease-in-out;
+    margin: 20px 0;
+}
+
+.auth-card-panel-error i {
+    margin-right: 1rem;
+    font-size: 1.5rem;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
 .auth-card .card-title::after {
     content: '';
     position: absolute;

@@ -1,167 +1,173 @@
 {% extends 'demo/base.html' %}
+{% load static %}
 
 {% block title %}用户登录{% endblock %}
 
 {% block extra_css %}
-<style>
-    /* 用户信息展示区域优化样式 */
-    .demo-account-info {
-        background: linear-gradient(135deg, #26a69a, #009688);
-        border-radius: 12px;
-        padding: 20px;
-        margin: 20px 0;
-        color: white;
-        box-shadow: 0 5px 15px rgba(38, 166, 154, 0.3);
-        border: none;
-        position: relative;
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-    
-    .demo-account-info:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(38, 166, 154, 0.4);
-    }
-    
-    .demo-account-info::before {
-        content: '';
-        position: absolute;
-        top: -10px;
-        right: -10px;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
-    }
-    
-    .demo-account-info::after {
-        content: '';
-        position: absolute;
-        bottom: -15px;
-        left: -15px;
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.05);
-    }
-    
-    .demo-account-info .info-title {
-        display: flex;
-        align-items: center;
-        font-weight: 600;
-        font-size: 1.1rem;
-        margin-bottom: 15px;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .demo-account-info .info-content {
-        position: relative;
-        z-index: 1;
-    }
-    
-    .demo-account-info .info-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .demo-account-info .info-item:last-child {
-        border-bottom: none;
-    }
-    
-    .demo-account-info .info-label {
-        font-weight: 500;
-    }
-    
-    .demo-account-info .info-value {
-        font-family: 'Courier New', monospace;
-        font-weight: 600;
-        background: rgba(255, 255, 255, 0.15);
-        padding: 2px 10px;
-        border-radius: 6px;
-        letter-spacing: 1px;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
 {% endblock %}
 
 {% block content %}
-<body class="login-page">
+<body class="auth-body login-page">
     <div class="login-container">
-        <form method="post" action="{% url 'demo:login' %}" class="login-card">
+        <form method="post" action="{% url 'demo:login' %}" class="login-card" id="loginForm">
             {% csrf_token %}
-            <div class="card-content">
-                <span class="card-title deep-purple-text text-darken-2">
-                    <i class="material-icons medium" style="vertical-align: middle">fingerprint</i>
-                    Django演示系统
-                </span>
-                
-                <!-- 用户信息展示区域 -->
-                <div class="demo-account-info">
-                    <div class="info-title">
-                        <i class="material-icons">info</i>
-                        <span>演示账户信息</span>
+            
+            <div class="login-title">
+                <h2>欢迎回来</h2>
+                <div class="subtitle">登录您的Django Hub账户</div>
+            </div>
+            
+            <!-- 演示账户信息区域 -->
+            <div class="demo-account-info">
+                <div class="info-title">
+                    <i class="material-icons">lock</i>
+                    <span>演示账户信息</span>
+                </div>
+                <div class="info-content">
+                    <div class="info-item">
+                        <span class="info-label">用户名:</span>
+                        <span class="info-value">admin</span>
                     </div>
-                    <div class="info-content">
-                        <div class="info-item">
-                            <span class="info-label">用户名:</span>
-                            <span class="info-value">admin</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">密码:</span>
-                            <span class="info-value">admin</span>
-                        </div>
-                    </div>
-                </div>
-                
-                {% if messages %}
-                <div class="card-panel auth-card-panel-error">
-                    <i class="material-icons" style="margin-right: 1rem">error</i>
-                    {% for message in messages %}
-                        {{ message }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-                
-                <div class="input-field auth-input-field">
-                    <input type="text" id="username" name="username" class="validate" required>
-                    <label for="username">用户名</label>
-                    <span class="helper-text">请输入您的用户名</span>
-                </div>
-                
-                <div class="input-field auth-input-field">
-                    <input type="password" id="password" name="password" class="validate" required>
-                    <label for="password">密码</label>
-                    <span class="helper-text">请输入您的密码</span>
-                </div>
-                
-                <p class="left-align">
-                    <label class="switch">
-                        <input type="checkbox" class="filled-in" id="rememberMe" name="remember_me"/>
-                        <span class="lever"></span>
-                        <span>记住我</span>
-                    </label>
-                </p>
-                
-                <button class="login-btn" type="submit">
-                    <i class="material-icons">send</i>
-                    登录
-                </button>
-                
-                <div class="row" style="margin-top: 1.5rem;">
-                    <div class="col s12">
-                        <p class="left-align">还没有账号？ 
-                            <a href="{% url 'demo:register' %}" class="indigo-text">立即注册</a>
-                        </p>
+                    <div class="info-item">
+                        <span class="info-label">密码:</span>
+                        <span class="info-value">admin</span>
                     </div>
                 </div>
             </div>
             
-            <div class="card-action" style="text-align: center; padding: 20px;">
-                <span class="grey-text text-darken-1 small">powered by KTO © 2025</span>
+            {% if messages %}
+            <div class="login-error">
+                <i class="material-icons error-icon">error</i>
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="login-field">
+                <input type="text" id="username" name="username" placeholder=" " required>
+                <label for="username">用户名</label>
+                <span class="helper-text" style="font-size: 0.85rem; color: #666; margin-top: 5px; display: block;">请输入您的用户名</span>
+            </div>
+            
+            <div class="login-field">
+                <input type="password" id="password" name="password" placeholder=" " required>
+                <label for="password">密码</label>
+                <span class="helper-text" style="font-size: 0.85rem; color: #666; margin-top: 5px; display: block;">请输入您的密码</span>
+            </div>
+            
+            <div class="remember-me" onclick="toggleRememberMe()">
+                <input type="checkbox" id="rememberMe" name="remember_me">
+                <span class="checkmark"></span>
+                记住我
+            </div>
+            
+            <button class="login-btn" type="submit" id="loginBtn">
+                <i class="material-icons btn-icon">login</i>
+                立即登录
+            </button>
+            
+            <div class="register-link-section">
+                <p>还没有账号？ <a href="{% url 'demo:register' %}" class="register-link">立即注册</a></p>
             </div>
         </form>
     </div>
+    
+    <script>
+        // 表单提交动画
+        const loginBtn = document.getElementById('loginBtn');
+        const loginForm = document.getElementById('loginForm');
+        
+        loginForm.addEventListener('submit', function(e) {
+            loginBtn.classList.add('loading');
+            loginBtn.innerHTML = '<div class="loading-spinner"></div>登录中...';
+        });
+        
+        // 自动填充演示账户
+        document.addEventListener('DOMContentLoaded', function() {
+            const demoLink = document.createElement('div');
+            demoLink.innerHTML = `
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button type="button" onclick="fillDemoAccount()" style="
+                        background: rgba(67, 233, 123, 0.1); 
+                        color: #43e97b; 
+                        border: 1px solid #43e97b; 
+                        padding: 0.5rem 1rem; 
+                        border-radius: 8px; 
+                        cursor: pointer; 
+                        font-size: 0.9rem;
+                        transition: all 0.3s ease;
+                    ">试用演示账户</button>
+                </div>
+            `;
+            loginForm.appendChild(demoLink);
+        });
+        
+        function fillDemoAccount() {
+            document.getElementById('username').value = 'admin';
+            document.getElementById('password').value = 'admin';
+            
+            // 触发输入事件以更新样式
+            document.getElementById('username').dispatchEvent(new Event('input'));
+            document.getElementById('password').dispatchEvent(new Event('input'));
+        }
+        
+        // 表单验证反馈
+        const inputs = document.querySelectorAll('.login-field input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value.length > 0) {
+                    this.classList.add('valid');
+                    this.classList.remove('invalid');
+                } else {
+                    this.classList.remove('valid');
+                }
+            });
+        });
+        
+        // 记住我复选框功能
+        function toggleRememberMe() {
+            const checkbox = document.getElementById('rememberMe');
+            checkbox.checked = !checkbox.checked;
+            
+            // 更新视觉状态
+            const checkmark = checkbox.nextElementSibling;
+            if (checkbox.checked) {
+                checkmark.style.background = '#667eea';
+                checkmark.style.borderColor = '#667eea';
+            } else {
+                checkmark.style.background = '';
+                checkmark.style.borderColor = '#ddd';
+            }
+        }
+        
+        // 初始化复选框状态
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkbox = document.getElementById('rememberMe');
+            const checkmark = checkbox.nextElementSibling;
+            
+            // 设置初始状态
+            if (checkbox.checked) {
+                checkmark.style.background = '#667eea';
+                checkmark.style.borderColor = '#667eea';
+            }
+            
+            // 添加键盘支持
+            checkbox.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleRememberMe();
+                }
+            });
+        });
+        
+        // 快捷键支持
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                loginForm.submit();
+            }
+        });
+    </script>
 </body>
 {% endblock %}

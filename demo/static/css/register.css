@@ -1,0 +1,572 @@
+/* 注册页面专用样式优化 */
+
+/* 注册页面背景和布局 */
+.auth-body.register-page {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-body.register-page::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: floatBackground 20s linear infinite;
+    z-index: 0;
+}
+
+.auth-body.register-page::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.15)"/><circle cx="50" cy="50" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="30" r="1" fill="rgba(255,255,255,0.08)"/></svg>');
+    opacity: 0.5;
+    z-index: 0;
+}
+
+@keyframes floatBackground {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(-50px, -50px) rotate(360deg); }
+}
+
+/* 注册卡片容器 */
+.register-container {
+    max-width: 500px;
+    width: 100%;
+    z-index: 1;
+    position: relative;
+}
+
+.register-card {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    padding: 3rem 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transform: translateY(0);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.register-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 35px 70px rgba(0, 0, 0, 0.35);
+}
+
+/* 标题样式 */
+.register-title {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    position: relative;
+}
+
+.register-title h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.register-title .subtitle {
+    color: #666;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    opacity: 0.8;
+}
+
+/* 表单字段优化 */
+.register-field {
+    margin-bottom: 1.8rem;
+    position: relative;
+}
+
+.register-field input {
+    width: 100%;
+    padding: 1.2rem 1.5rem;
+    border: 2px solid #e8e8e8;
+    border-radius: 16px;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 1;
+}
+
+.register-field input:focus {
+    border-color: #6a11cb;
+    box-shadow: 0 8px 25px rgba(106, 17, 203, 0.25);
+    background: white;
+    transform: translateY(-2px);
+}
+
+.register-field label {
+    position: absolute;
+    left: 1.5rem;
+    top: 1.2rem;
+    color: #999;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    background: white;
+    padding: 0 0.5rem;
+    z-index: 2;
+}
+
+.register-field input:focus + label,
+.register-field input:not(:placeholder-shown) + label {
+    top: -0.8rem;
+    left: 1rem;
+    font-size: 0.85rem;
+    color: #6a11cb;
+    font-weight: 600;
+}
+
+/* 密码强度指示器 */
+.password-strength {
+    margin-top: 0.5rem;
+    height: 4px;
+    border-radius: 2px;
+    background: #e0e0e0;
+    overflow: hidden;
+    position: relative;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.strength-weak { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); }
+.strength-medium { background: linear-gradient(135deg, #ffd93d, #ff9a3d); }
+.strength-strong { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+
+.strength-text {
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    color: #666;
+    text-align: right;
+}
+
+/* 注册按钮优化 */
+.register-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 1.2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 8px 25px rgba(106, 17, 203, 0.4);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.register-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.8s ease;
+}
+
+.register-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(106, 17, 203, 0.6);
+}
+
+.register-btn:hover::before {
+    left: 100%;
+}
+
+.register-btn:active {
+    transform: translateY(0);
+}
+
+.register-btn .btn-icon {
+    margin-right: 0.8rem;
+    font-size: 1.3rem;
+    vertical-align: middle;
+}
+
+/* 登录链接区域 */
+.login-link-section {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.login-link-section p {
+    margin: 0;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.login-link {
+    color: #6a11cb;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.login-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #6a11cb;
+    transition: width 0.3s ease;
+}
+
+.login-link:hover {
+    color: #2575fc;
+}
+
+.login-link:hover::after {
+    width: 100%;
+}
+
+/* 错误消息样式 */
+.register-error {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+    animation: shake 0.5s ease-in-out;
+    display: flex;
+    align-items: center;
+}
+
+.register-error .error-icon {
+    margin-right: 0.8rem;
+    font-size: 1.3rem;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* 成功消息样式 */
+.register-success {
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 20px rgba(67, 233, 123, 0.3);
+    animation: bounceIn 0.6s ease-in-out;
+    display: flex;
+    align-items: center;
+}
+
+.register-success .success-icon {
+    margin-right: 0.8rem;
+    font-size: 1.3rem;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .auth-body.register-page {
+        padding: 15px;
+    }
+    
+    .register-card {
+        padding: 2rem 1.5rem;
+        border-radius: 20px;
+    }
+    
+    .register-title h2 {
+        font-size: 1.8rem;
+    }
+    
+    .register-field input {
+        padding: 1rem 1.2rem;
+    }
+    
+    .register-btn {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-body.register-page {
+        padding: 10px;
+    }
+    
+    .register-card {
+        padding: 1.5rem 1rem;
+        border-radius: 18px;
+    }
+    
+    .register-title h2 {
+        font-size: 1.6rem;
+    }
+    
+    .register-field input {
+        padding: 0.9rem 1rem;
+    }
+    
+    .register-btn {
+        padding: 0.9rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* 加载状态 */
+.register-btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+    transform: none !important; /* 关键修复：禁用所有transform效果 */
+}
+
+.register-btn.loading:hover {
+    transform: none !important; /* 禁用悬停时的transform */
+    box-shadow: 0 8px 25px rgba(106, 17, 203, 0.4) !important; /* 保持原始阴影 */
+}
+
+.register-btn .loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+    margin-right: 0.8rem;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 表单验证样式 */
+.register-field input.valid {
+    border-color: #43e97b;
+    background: rgba(67, 233, 123, 0.05);
+}
+
+.register-field input.invalid {
+    border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.05);
+    animation: pulseInvalid 0.5s ease-in-out;
+}
+
+@keyframes pulseInvalid {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}
+
+/* 模态框样式 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.15); /* 进一步降低透明度 */
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(1px); /* 最小化模糊 */
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal .modal-content {
+    background: rgba(255, 255, 255, 0.98); /* 轻微透明 */
+    backdrop-filter: blur(10px);
+    padding: 2.5rem;
+    border-radius: 20px;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2); /* 减轻阴影 */
+    position: relative;
+    z-index: 10000;
+    animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.modal h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 3px solid #6a11cb;
+    padding-bottom: 1rem;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.modal h4 {
+    color: #6a11cb;
+    margin: 1.5rem 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.modal h5 {
+    color: #666;
+    margin: 1rem 0 0.5rem 0;
+    font-weight: 500;
+}
+
+.modal p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.modal .modal-actions {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.modal .modal-close-btn {
+    padding: 0.75rem 2rem;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    box-shadow: 0 8px 20px rgba(106, 17, 203, 0.3);
+}
+
+.modal .modal-close-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(106, 17, 203, 0.4);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 自定义复选框 */
+.terms-checkbox {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+    cursor: pointer;
+    color: #666;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.terms-checkbox:hover {
+    color: #333;
+}
+
+.terms-checkbox input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.terms-checkbox .checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    margin-right: 0.8rem;
+    position: relative;
+    transition: all 0.3s ease;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.terms-checkbox .checkmark::after {
+    content: '';
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.terms-checkbox input[type="checkbox"]:checked + .checkmark {
+    background: #6a11cb;
+    border-color: #6a11cb;
+}
+
+.terms-checkbox input[type="checkbox"]:checked + .checkmark::after {
+    display: block;
+}
+
+.terms-checkbox a {
+    color: #6a11cb;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.terms-checkbox a:hover {
+    color: #2575fc;
+    text-decoration: underline;
+}

@@ -76,6 +76,8 @@ main {
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .user-info:hover {
@@ -115,10 +117,31 @@ main {
 .user-info h6 {
     font-weight: 600;
     letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+}
+
+.user-info .user-group {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    backdrop-filter: blur(5px);
 }
 
 .user-info .user-login-time {
-    margin-top: 10px;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.user-info .user-login-time i {
+    margin-right: 8px;
+    font-size: 1.1rem;
 }
 
 /* 侧边栏菜单 */
@@ -128,6 +151,8 @@ main {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(5px);
 }
 
 .collection .collection-header {
@@ -138,6 +163,8 @@ main {
     color: white;
     font-weight: 600;
     letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
 }
 
 .collection .collection-header h5 {
@@ -145,12 +172,26 @@ main {
     font-size: 1.3rem;
     color: white;
     font-weight: 600;
+    position: relative;
+    z-index: 1;
+}
+
+.collection .collection-header::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    z-index: 0;
 }
 
 .collection .collection-item {
     border: none;
     padding: 15px 20px;
-    margin: 5px 10px;
+    margin: 8px 12px;
     border-radius: 12px;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     cursor: pointer;
@@ -159,6 +200,9 @@ main {
     align-items: center;
     font-weight: 500;
     background: rgba(102, 126, 234, 0.05);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .collection .collection-item:hover {
@@ -168,6 +212,10 @@ main {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
+.collection .collection-item:hover::before {
+    transform: translateX(0);
+}
+
 .collection .collection-item.active {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -175,10 +223,19 @@ main {
     transform: translateX(5px);
 }
 
+.collection .collection-item.active:hover {
+    transform: translateX(8px);
+}
+
 .collection .collection-item i {
     margin-right: 12px;
     flex-shrink: 0;
     font-size: 1.2rem;
+}
+
+.collection .collection-item span {
+    position: relative;
+    z-index: 1;
 }
 
 /* 内容卡片 */
@@ -191,11 +248,17 @@ main {
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     border: 1px solid rgba(0,0,0,0.03);
     backdrop-filter: blur(5px);
+    position: relative;
+    overflow: hidden;
 }
 
 .content-card:hover {
     box-shadow: 0 15px 40px rgba(0,0,0,0.12);
     transform: translateY(-3px);
+}
+
+.content-card:hover::before {
+    left: 100%;
 }
 
 .content-card .header {
@@ -218,6 +281,30 @@ main {
     border-radius: 2px;
 }
 
+/* 卡片装饰元素 */
+.content-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s ease;
+}
+
+.content-card::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.05);
+    z-index: 0;
+}
+
 /* 按钮样式 */
 .btn-floating {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -227,12 +314,32 @@ main {
     width: 50px;
     height: 50px;
     line-height: 50px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn-floating::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
 }
 
 .btn-floating:hover {
     background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
     transform: scale(1.1) rotate(5deg);
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+}
+
+.btn-floating:hover::before {
+    opacity: 1;
 }
 
 .btn, .btn-small {
@@ -249,11 +356,31 @@ main {
     padding: 0 20px;
     height: 42px;
     line-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn::before, .btn-small::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
 }
 
 .btn:hover, .btn-small:hover {
     box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     transform: translateY(-2px);
+}
+
+.btn:hover::before, .btn-small:hover::before {
+    opacity: 1;
 }
 
 .btn:active, .btn-small:active {
@@ -268,6 +395,25 @@ main {
 
 .btn:hover i, .btn-small:hover i {
     transform: translateX(3px);
+}
+
+/* 按钮波纹效果 */
+.btn::after, .btn-small::after, .btn-floating::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255,255,255,0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.btn:focus:not(:active)::after, .btn-small:focus:not(:active)::after, .btn-floating:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
 }
 
 /* 特殊按钮颜色 */
@@ -293,6 +439,8 @@ main {
     max-width: 650px;
     overflow: hidden;
     border: none;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
 @media (max-width: 992px) {
@@ -353,6 +501,7 @@ main {
     font-weight: 600;
     position: relative;
     z-index: 1;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .modal .modal-content {
@@ -360,10 +509,24 @@ main {
     overflow-y: auto;
     max-height: calc(100% - 140px);
     background: rgba(255, 255, 255, 0.95);
+    position: relative;
+}
+
+.modal .modal-content::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.05);
+    z-index: 0;
 }
 
 .modal .input-field {
     margin-bottom: 25px;
+    position: relative;
 }
 
 .modal .input-field input:focus,
@@ -384,6 +547,7 @@ main {
     display: flex;
     justify-content: flex-end;
     border-top: 1px solid rgba(0,0,0,0.05);
+    backdrop-filter: blur(5px);
 }
 
 .modal .modal-close {
@@ -399,11 +563,31 @@ main {
     text-transform: none;
     margin-left: 15px;
     border: none;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.modal .modal-close::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
 }
 
 .modal .modal-close:hover {
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
     transform: translateY(-2px);
+}
+
+.modal .modal-close:hover::before {
+    opacity: 1;
 }
 
 .modal .modal-close:active {
@@ -452,6 +636,10 @@ table {
     border-collapse: separate;
     border-spacing: 0 10px;
     width: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.03);
 }
 
 table.highlight > thead > tr > th {
@@ -460,6 +648,15 @@ table.highlight > thead > tr > th {
     color: #333;
     border-bottom: 2px solid rgba(102, 126, 234, 0.3);
     background: rgba(102, 126, 234, 0.05);
+    position: relative;
+}
+
+table.highlight > thead > tr > th:first-child {
+    border-radius: 12px 0 0 0;
+}
+
+table.highlight > thead > tr > th:last-child {
+    border-radius: 0 12px 0 0;
 }
 
 table.highlight > tbody > tr {
@@ -468,12 +665,18 @@ table.highlight > tbody > tr {
     background-color: white;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     border: 1px solid rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
 }
 
 table.highlight > tbody > tr:hover {
     background-color: rgba(102, 126, 234, 0.05);
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+table.highlight > tbody > tr:hover::after {
+    opacity: 1;
 }
 
 table.highlight > tbody > tr.selected {
@@ -487,6 +690,8 @@ table.highlight > tbody > tr td {
     padding: 18px 12px;
     border: none;
     vertical-align: middle;
+    position: relative;
+    z-index: 1;
 }
 
 table.highlight > tbody > tr td:first-child {
@@ -495,6 +700,17 @@ table.highlight > tbody > tr td:first-child {
 
 table.highlight > tbody > tr td:last-child {
     border-radius: 0 12px 12px 0;
+}
+
+/* 表格装饰元素 */
+table.highlight > thead > tr > th::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.5), transparent);
 }
 
 /* 表单字段 */
@@ -585,12 +801,25 @@ table.highlight > tbody > tr td:last-child {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(0,0,0,0.05);
     display: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-hint::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
 }
 
 .action-hint.show {
     transform: translateY(0);
     opacity: 1;
     display: block;
+    animation: fadeInUp 0.5s ease-out;
 }
 
 .action-hint .close {
@@ -607,11 +836,13 @@ table.highlight > tbody > tr td:last-child {
     justify-content: center;
     border-radius: 50%;
     transition: all 0.3s ease;
+    background: rgba(0,0,0,0.03);
 }
 
 .action-hint .close:hover {
     opacity: 1;
-    background: rgba(0,0,0,0.05);
+    background: rgba(0,0,0,0.1);
+    transform: rotate(90deg);
 }
 
 /* 移动端菜单按钮 */
@@ -632,6 +863,20 @@ table.highlight > tbody > tr td:last-child {
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     backdrop-filter: blur(5px);
     border: 1px solid rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.mobile-menu-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .mobile-menu-btn:hover {
@@ -639,15 +884,25 @@ table.highlight > tbody > tr td:last-child {
     box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 
+.mobile-menu-btn:hover::before {
+    opacity: 1;
+}
+
+.mobile-menu-btn:hover i {
+    animation: pulse 1s infinite;
+}
+
 .mobile-menu-btn.active {
     transform: rotate(90deg) scale(1.1);
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    animation: bounce 0.3s ease;
 }
 
 .mobile-menu-btn i {
     font-size: 28px;
+    transition: all 0.3s ease;
 }
 
 /* 响应式设计 */
@@ -765,7 +1020,8 @@ table.highlight > tbody > tr td:last-child {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* 动画效果 */
@@ -798,6 +1054,80 @@ table.highlight > tbody > tr td:last-child {
 
 .fade-out {
     animation: fadeOut 0.3s ease-out;
+}
+
+/* 波纹动画 */
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(25, 25);
+        opacity: 0;
+    }
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+    }
+}
+
+/* 闪烁动画 */
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* 旋转动画 */
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 弹跳动画 */
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* 缩放动画 */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.scale-in {
+    animation: scaleIn 0.3s ease-out;
 }
 
 /* 卡片悬停效果增强 */

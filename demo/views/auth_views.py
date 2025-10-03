@@ -14,12 +14,21 @@ def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        log_security(f"用户尝试登录: {username}", request)
+        remember_me = request.POST.get('remember_me') == 'on'
+        log_security(f"用户尝试登录: {username}, 记住我: {remember_me}", request)
         
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
             login(request, user)
+            # 处理记住我功能
+            if remember_me:
+                # 设置会话过期时间为30天
+                request.session.set_expiry(30 * 24 * 60 * 60)
+            else:
+                # 浏览器关闭时会话过期
+                request.session.set_expiry(0)
+            
             log_security(f"用户登录成功: {username}", request)
             return redirect('demo:home')
         else:

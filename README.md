@@ -1,4 +1,4 @@
-# Django Hub - 企业级用户管理系统
+# Django Hub - 现代化用户管理平台
 
 <div align="center">
   <img src="https://www.djangoproject.com/m/img/logos/django-logo-positive.png" alt="Django" width="300">
@@ -21,7 +21,7 @@
 
 ## 🚀 项目概述
 
-**Django Hub** 是一个基于Django框架构建的**企业级用户管理系统**，采用模块化架构设计，提供完整的用户管理、权限控制、认证系统和RESTful API接口。该项目展示了现代Django应用的最佳实践，包括分层架构、高级日志记录、容器化部署等特性。
+**Django Hub** 是一个基于Django 4.2框架构建的**现代化用户管理平台**，采用企业级架构设计，提供完整的用户管理、权限控制、认证系统和RESTful API接口。该项目展示了现代Django应用的最佳实践，包括模块化设计、高级日志记录、容器化部署等特性。
 
 ### ✨ 核心特性
 
@@ -30,18 +30,27 @@
 - **🔧 向后兼容**: 保持URL路由兼容性的同时支持新架构
 - **🛡️ 权限系统**: 基于Django原生权限的三层权限控制
 - **📊 高级日志**: 基于Loguru的分级日志、自动轮转和错误回溯
+- **🎯 客户端追踪**: 支持客户端IP、User-Agent等信息记录
 
 #### 💼 业务功能
 - **👥 用户管理**: 完整的用户CRUD操作，支持用户状态管理
 - **🏢 用户组管理**: 用户组的创建、更新和成员管理
 - **🔐 权限控制**: 细粒度的权限管理系统
 - **⚙️ 系统初始化**: 一键初始化系统数据和配置
+- **🔑 密码管理**: 安全的密码修改和重置功能
 
 #### 🛠️ 技术特性
 - **🌐 RESTful API**: 标准的API设计，支持JSON格式
 - **🔒 安全配置**: CSRF保护、CORS支持、安全头设置
 - **🐳 容器化**: 完整的Docker部署方案
 - **📝 详细日志**: 操作日志、错误追踪、性能监控
+- **🔍 错误回溯**: 详细的错误追踪和诊断功能
+
+#### 🎨 用户体验
+- **📱 响应式设计**: 支持多种设备和屏幕尺寸
+- **🎭 现代UI**: 清新简洁的用户界面
+- **⚡ 快速响应**: 优化的前端性能
+- **🌍 国际化支持**: 完整的中文本地化
 
 <hr style="height: 1px; background: #eee;">
 
@@ -58,9 +67,79 @@
 
 ## 🔌 API接口文档
 
-项目提供完整的RESTful API接口，所有API均返回JSON格式数据。
+项目提供完整的RESTful API接口，所有API均返回JSON格式数据，支持CORS跨域请求。
+
+### 📋 API响应格式
+
+所有API接口统一返回以下JSON格式：
+
+```json
+{
+  "status": "success|error",
+  "message": "string",
+  "data": "object|array|null",
+  "errors": "object|null"
+}
+```
+
+**状态码说明：**
+- `200`: 成功
+- `400`: 请求参数错误
+- `401`: 未认证
+- `403`: 权限不足
+- `404`: 资源不存在
+- `500`: 服务器内部错误
+
+### 🔐 认证API
+
+#### 用户登录
+```http
+POST /demo/login/
+Content-Type: application/json
+
+{
+  "username": "string",
+  "password": "string"
+}
+```
+
+**响应示例：**
+```json
+{
+  "status": "success",
+  "message": "登录成功",
+  "data": {
+    "user_id": 1,
+    "username": "admin",
+    "email": "admin@example.com",
+    "is_superuser": true
+  }
+}
+```
+
+#### 用户注册
+```http
+POST /demo/register/
+Content-Type: application/json
+
+{
+  "username": "string",
+  "password": "string",
+  "email": "string"
+}
+```
+
+#### 用户登出
+```http
+POST /demo/logout/
+```
 
 ### 👤 用户管理API
+
+#### 获取用户列表
+```http
+GET /demo/users/
+```
 
 #### 创建用户
 ```http
@@ -147,33 +226,33 @@ Content-Type: application/json
 }
 ```
 
+#### 删除用户组
+```http
+DELETE /demo/groups/<group_id>/delete/
+```
+
 #### 获取用户组成员
 ```http
 GET /demo/groups/<group_id>/members/
 ```
 
-### 🔐 认证API
-
-#### 用户登录
+#### 添加用户到组
 ```http
-POST /demo/login/
+POST /demo/groups/<group_id>/add-member/
 Content-Type: application/json
 
 {
-  "username": "string",
-  "password": "string"
+  "user_id": "integer"
 }
 ```
 
-#### 用户注册
+#### 从组中移除用户
 ```http
-POST /demo/register/
+POST /demo/groups/<group_id>/remove-member/
 Content-Type: application/json
 
 {
-  "username": "string",
-  "password": "string",
-  "email": "string"
+  "user_id": "integer"
 }
 ```
 
@@ -184,31 +263,42 @@ Content-Type: application/json
 POST /demo/init-system/
 ```
 
-#### 首页
+**初始化内容：**
+- 创建默认用户组（超级管理员、管理员、普通用户）
+- 创建超级管理员账户（admin/admin）
+- 配置基础权限
+
+#### 系统状态检查
 ```http
-GET /demo/
+GET /demo/system/status/
 ```
 
-## 📋 API响应格式
-
-所有API接口统一返回以下JSON格式：
-
-```json
-{
-  "status": "success|error",
-  "message": "string",
-  "data": "object|array|null",
-  "errors": "object|null"
-}
+#### 获取系统信息
+```http
+GET /demo/system/info/
 ```
 
-**状态码说明：**
-- `200`: 成功
-- `400`: 请求参数错误
-- `401`: 未认证
-- `403`: 权限不足
-- `404`: 资源不存在
-- `500`: 服务器内部错误
+### 📊 统计API
+
+#### 获取用户统计
+```http
+GET /demo/stats/users/
+```
+
+#### 获取用户组统计
+```http
+GET /demo/stats/groups/
+```
+
+### 🔒 权限说明
+
+#### 权限级别
+- **超级管理员**: 所有权限
+- **管理员**: 用户管理权限、用户组查看权限
+- **普通用户**: 基础查看权限
+
+#### 权限验证
+所有API接口都会验证用户权限，确保用户只能访问有权限的资源。
 
 <hr style="height: 1px; background: #eee;">
 
@@ -244,20 +334,35 @@ django-hub/
 │   │   ├── group_views.py      # 用户组管理视图
 │   │   └── system_views.py     # 系统管理视图
 │   ├── migrations/             # 数据库迁移文件
-│   └── static/                 # 静态文件资源
+│   ├── static/                 # 静态文件资源
+│   │   ├── css/                # 样式文件
+│   │   │   ├── style.css       # 主样式
+│   │   │   ├── user-management.css  # 用户管理样式
+│   │   │   └── register.css    # 注册页面样式
+│   │   └── js/                 # JavaScript文件
+│   └── templates/              # 模板文件
+│       ├── demo/               # 应用模板
+│       │   ├── home.html       # 首页模板
+│       │   ├── login.html      # 登录页面
+│       │   ├── register.html   # 注册页面
+│       │   └── user_management.html  # 用户管理页面
+│       └── base.html           # 基础模板
 ├── data/                       # 数据存储目录
 │   └── db.sqlite3              # SQLite数据库文件
 ├── logs/                       # 日志文件目录
 │   ├── django.log              # 应用日志
 │   └── error.log               # 错误日志
 ├── staticfiles/                # 静态文件收集目录
-├── templates/                  # 模板文件目录
+├── media/                      # 媒体文件目录
+├── .codebuddy/                 # 代码助手配置
 ├── manage.py                   # Django管理脚本
 ├── requirements.txt            # Python依赖包列表
 ├── Dockerfile                  # Docker构建文件
 ├── entrypoint.sh               # 容器启动脚本
 ├── CLAUDE.md                   # Claude Code 开发指南
-└── README.md                   # 项目说明文档
+├── CODEBUDDY.md                # 代码助手配置
+├── README.md                   # 项目说明文档
+└── 注册页面样式优化与交互实现.md  # 开发文档
 ```
 
 ### 🏗️ 架构设计说明
@@ -266,18 +371,53 @@ django-hub/
 - **API层**: `demo/api/` - 纯粹的RESTful API接口
 - **视图层**: `demo/views/` - 按功能模块化的视图函数
 - **兼容层**: `demo/views.py` - 保持向后兼容的重新导出
+- **模板层**: `demo/templates/` - 用户界面模板
+- **静态层**: `demo/static/` - 前端资源文件
 
 #### 2. 核心模块
-- **认证模块**: `auth_views.py` - 用户登录、注册、首页
-- **用户模块**: `user_views.py` - 用户CRUD操作
-- **用户组模块**: `group_views.py` - 用户组管理
-- **系统模块**: `system_views.py` - 系统初始化
+- **认证模块**: `auth_views.py` - 用户登录、注册、首页、登出
+- **用户模块**: `user_views.py` - 用户CRUD操作、密码管理
+- **用户组模块**: `group_views.py` - 用户组管理、成员管理
+- **系统模块**: `system_views.py` - 系统初始化、状态检查
 
-#### 3. 日志系统
+#### 3. 数据模型
+- **User**: Django内置用户模型，扩展了用户管理功能
+- **Group**: Django内置组模型，支持用户组管理
+- **权限系统**: 基于Django原生权限的三层权限控制
+
+#### 4. 日志系统
 - **分级日志**: INFO级别应用日志，ERROR级别错误日志
 - **自动轮转**: 日志文件达到500MB自动轮转
 - **历史保留**: 保留30天的日志历史
 - **压缩存储**: 历史日志自动压缩为zip格式
+- **客户端追踪**: 支持IP、User-Agent等信息记录
+
+#### 5. 前端架构
+- **响应式设计**: 支持多种设备和屏幕尺寸
+- **模块化CSS**: 按功能分离的样式文件
+- **现代UI**: 清新简洁的用户界面
+- **交互体验**: 优化的用户交互反馈
+
+#### 6. 安全特性
+- **CSRF保护**: 防止跨站请求伪造
+- **CORS支持**: 跨域资源共享配置
+- **密码加密**: 安全的密码存储和验证
+- **权限验证**: 细粒度的权限控制系统
+- **输入验证**: 防止SQL注入和XSS攻击
+
+#### 7. API设计原则
+- **RESTful**: 遵循REST设计原则
+- **统一响应**: 标准化的JSON响应格式
+- **错误处理**: 完善的错误处理和状态码
+- **文档化**: 清晰的API文档和示例
+- **版本控制**: 支持API版本管理
+
+#### 8. 部署架构
+- **容器化**: Docker容器化部署
+- **可扩展**: 支持水平扩展
+- **监控**: 日志监控和性能监控
+- **备份**: 数据备份和恢复机制
+- **CI/CD**: 自动化构建和部署
 
 <hr style="height: 1px; background: #eee;">
 
@@ -289,6 +429,8 @@ django-hub/
 - **Django**: 4.2+
 - **数据库**: SQLite 3.0+ (开发) / PostgreSQL (生产)
 - **操作系统**: Windows / macOS / Linux
+- **内存**: 最低 2GB，推荐 4GB+
+- **存储**: 最低 5GB 可用空间
 
 ### 💻 本地开发
 
@@ -315,7 +457,18 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-#### 4. 数据库初始化
+#### 4. 环境配置
+```bash
+# 复制环境变量模板
+cp .env.example .env
+
+# 编辑环境变量
+# DEBUG=True
+# SECRET_KEY=your-secret-key-here
+# ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+#### 5. 数据库初始化
 ```bash
 # 运行数据库迁移
 python manage.py migrate
@@ -329,29 +482,24 @@ python manage.py shell
 >>> init_system()
 ```
 
-#### 5. 启动开发服务器
+#### 6. 启动开发服务器
 ```bash
 python manage.py runserver 0.0.0.0:8000
 ```
 
-#### 6. 访问应用
+#### 7. 访问应用
 - **应用首页**: http://localhost:8000/demo/
 - **管理后台**: http://localhost:8000/admin/
-- **API文档**: http://localhost:8000/demo/api/
+- **API接口**: http://localhost:8000/demo/api/
 
 ### 🐳 Docker 部署
 
-#### 1. 构建镜像
+#### 1. 快速启动
 ```bash
+# 构建镜像
 docker build -t django-hub .
-```
 
-#### 2. 运行容器
-```bash
-# 开发环境
-docker run -p 8000:8000 django-hub
-
-# 生产环境 (带数据持久化)
+# 运行容器
 docker run -d \
   --name django-hub \
   -p 8000:8000 \
@@ -360,37 +508,169 @@ docker run -d \
   django-hub
 ```
 
-#### 3. Docker Compose 部署
+#### 2. Docker Compose 部署
 ```bash
-# 如果有 docker-compose.yml
+# 使用 docker-compose 启动
 docker-compose up -d
+
+# 查看日志
+docker-compose logs -f
+
+# 停止服务
+docker-compose down
+```
+
+#### 3. 生产环境配置
+```yaml
+# docker-compose.prod.yml
+version: '3.8'
+services:
+  django-hub:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
 ```
 
 ### 🔧 配置说明
 
 #### 环境变量配置
 ```bash
-# 创建 .env 文件
-echo "DEBUG=False" > .env
-echo "SECRET_KEY=your-secret-key-here" >> .env
-echo "ALLOWED_HOSTS=localhost,127.0.0.1,yourdomain.com" >> .env
+# .env 文件示例
+DEBUG=True
+SECRET_KEY=your-secret-key-here
+ALLOWED_HOSTS=localhost,127.0.0.1
+# 数据库配置
+DB_NAME=django_hub
+DB_USER=postgres
+DB_PASSWORD=password
+DB_HOST=localhost
+DB_PORT=5432
 ```
 
 #### 数据库配置
-开发环境使用SQLite，生产环境可配置PostgreSQL：
+开发环境使用SQLite，生产环境建议使用PostgreSQL：
 
 ```python
-# settings.py
+# PostgreSQL 配置
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'django_hub',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME', 'django_hub'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'password'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
+```
+
+#### 日志配置
+```python
+# 日志级别设置
+LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
+LOG_FILE = os.environ.get('LOG_FILE', 'logs/django.log')
+ERROR_LOG_FILE = os.environ.get('ERROR_LOG_FILE', 'logs/error.log')
+```
+
+### 🚀 生产部署
+
+#### 云服务器部署
+```bash
+# 1. 更新系统
+sudo apt update && sudo apt upgrade -y
+
+# 2. 安装必要软件
+sudo apt install python3-pip python3-venv nginx postgresql
+
+# 3. 克隆项目
+git clone https://github.com/ktovoz/demo-django-hub.git
+cd demo-django-hub
+
+# 4. 配置环境
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# 5. 配置数据库
+sudo -u postgres createdb django_hub
+sudo -u postgres createuser --interactive
+
+# 6. 运行迁移
+python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py createsuperuser
+```
+
+#### Nginx 配置
+```nginx
+# /etc/nginx/sites-available/django-hub
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    location /static/ {
+        alias /path/to/project/staticfiles/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location /media/ {
+        alias /path/to/project/media/;
+        expires 1y;
+        add_header Cache-Control "public";
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+#### Gunicorn 服务配置
+```ini
+# /etc/systemd/system/django-hub.service
+[Unit]
+Description=Django Hub Gunicorn Service
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/path/to/project
+ExecStart=/path/to/venv/bin/gunicorn \
+    --workers 3 \
+    --bind 127.0.0.1:8000 \
+    --access-logfile - \
+    --error-logfile - \
+    DjangoProject.wsgi:application
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### SSL 证书配置
+```bash
+# 使用 Let's Encrypt
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d yourdomain.com
+
+# 自动续期
+sudo crontab -e
+# 添加以下行
+0 12 * * * /usr/bin/certbot renew --quiet
 ```
 
 ## 🧪 测试

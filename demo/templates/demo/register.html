@@ -1,63 +1,145 @@
 {% extends 'demo/base.html' %}
+{% load static %}
 
 {% block title %}用户注册{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
+{% endblock %}
+
 {% block content %}
-<body class="auth-body">
-    <div class="login-container">
-        <form method="post" class="auth-card">
+<body class="auth-body register-page">
+    <div class="register-container">
+        <form method="post" class="register-card" id="registerForm">
             {% csrf_token %}
-            <div class="card-content">
-                <span class="card-title deep-purple-text text-darken-2">
-                    <i class="material-icons medium" style="vertical-align: middle">app_registration</i>
-                    用户注册
-                </span>
-                
-                {% if messages %}
-                <div class="card-panel auth-card-panel-error">
-                    <i class="material-icons" style="margin-right: 1rem">error</i>
-                    {% for message in messages %}
-                        {{ message }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-                
-                <div class="input-field auth-input-field">
-                    <input id="username" name="username" type="text" class="validate" required>
-                    <label for="username">用户名</label>
-                    <span class="helper-text">请输入4-20个字符的用户名</span>
-                </div>
-                
-                <div class="input-field auth-input-field">
-                    <input id="password1" name="password1" type="password" class="validate" required>
-                    <label for="password1">密码</label>
-                    <span class="helper-text">密码至少包含8个字符</span>
-                </div>
-                
-                <div class="input-field auth-input-field">
-                    <input id="password2" name="password2" type="password" class="validate" required>
-                    <label for="password2">确认密码</label>
-                    <span class="helper-text">请再次输入密码以确认</span>
-                </div>
-                
-                <button class="btn auth-btn" type="submit" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100);">
-                    <i class="material-icons">send</i>
-                    注册
-                </button>
-                
-                <div class="row" style="margin-top: 1.5rem;">
-                    <div class="col s12">
-                        <p class="left-align">已有账号？
-                            <a href="{% url 'demo:login' %}" class="indigo-text">立即登录</a>
-                        </p>
-                    </div>
-                </div>
+            
+            <div class="register-title">
+                <h2>创建账户</h2>
+                <div class="subtitle">开启您的Django Hub之旅</div>
             </div>
             
-            <div class="card-action" style="text-align: center; padding: 20px;">
-                <span class="grey-text text-darken-1 small">powered by KTO © 2025</span>
+            {% if messages %}
+            <div class="register-error">
+                <i class="material-icons error-icon">error</i>
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="register-field">
+                <input id="username" name="username" type="text" placeholder=" " required>
+                <label for="username">用户名</label>
+                <span class="helper-text" style="font-size: 0.85rem; color: #666; margin-top: 5px; display: block;">请输入4-20个字符的用户名</span>
+            </div>
+            
+            <div class="register-field">
+                <input id="password1" name="password1" type="password" placeholder=" " required>
+                <label for="password1">密码</label>
+                <div class="password-strength">
+                    <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                </div>
+                <div class="strength-text" id="passwordStrengthText">密码强度</div>
+                <span class="helper-text" style="font-size: 0.85rem; color: #666; margin-top: 5px; display: block;">密码至少包含8个字符</span>
+            </div>
+            
+            <div class="register-field">
+                <input id="password2" name="password2" type="password" placeholder=" " required>
+                <label for="password2">确认密码</label>
+                <span class="helper-text" style="font-size: 0.85rem; color: #666; margin-top: 5px; display: block;">请再次输入密码以确认</span>
+            </div>
+            
+            
+            <button class="register-btn" type="submit" id="registerBtn">
+                <i class="material-icons btn-icon">person_add</i>
+                立即注册
+            </button>
+            
+            <div class="login-link-section">
+                <p>已有账号？ <a href="{% url 'demo:login' %}" class="login-link">立即登录</a></p>
             </div>
         </form>
     </div>
+    
+    
+    <script>
+        // 密码强度检查
+        const password1 = document.getElementById('password1');
+        const strengthBar = document.getElementById('passwordStrengthBar');
+        const strengthText = document.getElementById('passwordStrengthText');
+        
+        password1.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            if (password.length >= 8) strength += 25;
+            if (/[A-Z]/.test(password)) strength += 25;
+            if (/[0-9]/.test(password)) strength += 25;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+            
+            strengthBar.style.width = strength + '%';
+            
+            if (strength < 50) {
+                strengthBar.className = 'password-strength-bar strength-weak';
+                strengthText.textContent = '密码强度：弱';
+            } else if (strength < 75) {
+                strengthBar.className = 'password-strength-bar strength-medium';
+                strengthText.textContent = '密码强度：中';
+            } else {
+                strengthBar.className = 'password-strength-bar strength-strong';
+                strengthText.textContent = '密码强度：强';
+            }
+        });
+        
+        // 密码确认验证
+        const password2 = document.getElementById('password2');
+        
+        password2.addEventListener('input', function() {
+            if (password1.value !== this.value && this.value.length > 0) {
+                this.classList.add('invalid');
+            } else {
+                this.classList.remove('invalid');
+                this.classList.add('valid');
+            }
+        });
+        
+        // 表单提交动画
+        const registerBtn = document.getElementById('registerBtn');
+        const registerForm = document.getElementById('registerForm');
+        
+        registerForm.addEventListener('submit', function(e) {
+            if (password1.value !== password2.value) {
+                e.preventDefault();
+                password2.classList.add('invalid');
+                password2.focus();
+                return;
+            }
+            
+            registerBtn.classList.add('loading');
+            registerBtn.innerHTML = '<div class="loading-spinner"></div>注册中...';
+        });
+        
+        // 模态框控制
+        function showTermsModal() {
+            document.getElementById('termsModal').style.display = 'flex';
+        }
+        
+        function showPrivacyModal() {
+            // 类似实现隐私政策模态框
+            showTermsModal(); // 暂时使用同一个模态框
+        }
+        
+        function closeModal() {
+            document.getElementById('termsModal').style.display = 'none';
+        }
+        
+        
+        // 点击模态框外部关闭
+        document.getElementById('termsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 {% endblock %}
