@@ -372,18 +372,22 @@ body {
     width: min(100%, 520px);
     padding: clamp(32px, 5vw, 48px);
     border-radius: var(--auth-radius-lg);
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.18) 0%, 
-        rgba(255, 255, 255, 0.12) 50%, 
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.18) 0%,
+        rgba(255, 255, 255, 0.12) 50%,
         rgba(255, 255, 255, 0.08) 100%);
     backdrop-filter: blur(26px);
     border: 1px solid rgba(255, 255, 255, 0.24);
     color: #ffffff;
-    box-shadow: 
+    box-shadow:
         0 25px 50px rgba(20, 20, 43, 0.3),
         0 0 0 1px rgba(255, 255, 255, 0.1);
     position: relative;
     overflow: hidden;
+}
+
+.auth-hero__card h1 {
+    margin-top: 0;
 }
 
 .auth-hero__card::before {
@@ -393,9 +397,9 @@ body {
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(255, 255, 255, 0.4) 50%, 
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
         transparent 100%);
 }
 
@@ -468,56 +472,30 @@ body {
     flex-shrink: 0;
 }
 
+.auth-hero__footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    font-size: 0.85rem;
+    opacity: 0.7;
+    text-align: center;
+}
+
 .auth-hero__list span {
     font-size: 0.95rem;
     line-height: 1.4;
     opacity: 0.95;
 }
 
-.auth-hero__list span strong {
-    font-weight: 600;
-    color: #e0e7ff;
-}
-
-.auth-hero__stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+.auth-hero__footer {
     margin-top: 32px;
-    padding-top: 24px;
+    padding-top: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.stat-item {
+    font-size: 0.85rem;
+    opacity: 0.7;
     text-align: center;
-    padding: 12px;
-    border-radius: var(--auth-radius-sm);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
 }
 
-.stat-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.stat-number {
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #22d3ee, #3b82f6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 4px;
-}
-
-.stat-label {
-    font-size: 0.8rem;
-    opacity: 0.8;
-    font-weight: 500;
-}
 
 @keyframes spin {
     to { transform: rotate(360deg); }
