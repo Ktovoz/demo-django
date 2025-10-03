@@ -54,6 +54,26 @@ function bindTableRowEvents() {
     });
 }
 
+// 添加表格行点击效果
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('table.highlight > tbody > tr').forEach(tr => {
+        tr.addEventListener('click', function(e) {
+            // 如果点击的不是按钮或链接，则添加选中效果
+            if (!e.target.closest('button, a, .btn, .btn-small')) {
+                // 移除其他行的选中状态
+                document.querySelectorAll('table.highlight > tbody > tr').forEach(otherTr => {
+                    if (otherTr !== this) {
+                        otherTr.classList.remove('selected');
+                    }
+                });
+                
+                // 切换当前行的选中状态
+                this.classList.toggle('selected');
+            }
+        });
+    });
+});
+
 // 绑定菜单切换事件
 function bindMenuToggleEvents() {
     const menuToggle = document.getElementById('menuToggle');

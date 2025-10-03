@@ -71,10 +71,90 @@ logger.add(
     diagnose=True,  # 详细诊断信息
 )
 
+def get_client_info(request):
+    """
+    获取客户端信息（IP地址和浏览器标识）
+    
+    Args:
+        request: Django请求对象
+        
+    Returns:
+        dict: 包含IP地址和浏览器标识的字典
+    """
+    # 获取真实IP地址（考虑代理情况）
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR', 'unknown')
+    
+    # 获取浏览器标识
+    user_agent = request.META.get('HTTP_USER_AGENT', 'unknown')
+    
+    return {
+        'ip': ip,
+        'user_agent': user_agent
+    }
+
+def format_client_info(client_info):
+    """
+    格式化客户端信息用于日志记录
+    
+    Args:
+        client_info (dict): 客户端信息字典
+        
+    Returns:
+        str: 格式化后的字符串
+    """
+    ip = client_info.get('ip', 'unknown')
+    user_agent = client_info.get('user_agent', 'unknown')
+    
+    # 简化浏览器标识，只保留关键信息
+    if user_agent != 'unknown':
+        # 提取浏览器名称和版本
+        if 'Chrome' in user_agent and 'Edg' in user_agent:
+            browser = 'Edge'
+        elif 'Chrome' in user_agent:
+            browser = 'Chrome'
+        elif 'Firefox' in user_agent:
+            browser = 'Firefox'
+        elif 'Safari' in user_agent:
+            browser = 'Safari'
+        elif 'Edge' in user_agent:
+            browser = 'Edge'
+        else:
+            browser = 'Other'
+        
+        # 提取操作系统信息
+        if 'Windows' in user_agent:
+            os_info = 'Windows'
+        elif 'Mac' in user_agent:
+            os_info = 'Mac'
+        elif 'Linux' in user_agent:
+            os_info = 'Linux'
+        elif 'Android' in user_agent:
+            os_info = 'Android'
+        elif 'iPhone' in user_agent or 'iPad' in user_agent:
+            os_info = 'iOS'
+        else:
+            os_info = 'Other'
+        
+        user_agent_info = f"{browser}/{os_info}"
+    else:
+        user_agent_info = 'unknown'
+    
+    return f"[IP:{ip}|Browser:{user_agent_info}]"
+
 # 创建专用的日志函数
-def log_security(message: str, level: str = "INFO"):
+def log_security(message: str, request=None, level: str = "INFO"):
     """记录安全相关日志"""
-    log_message = f"SECURITY: {message}"
+    if request:
+        client_info = get_client_info(request)
+        client_info_str = format_client_info(client_info)
+        log_message = f"SECURITY: {client_info_str} {message}"
+    else:
+        log_message = f"SECURITY: {message}"
+    
     if level.upper() == "WARNING":
         logger.warning(log_message)
     elif level.upper() == "ERROR":
@@ -82,18 +162,31 @@ def log_security(message: str, level: str = "INFO"):
     else:
         logger.info(log_message)
 
-def log_audit(message: str, context: str = "system", level: str = "INFO"):
+def log_audit(message: str, request=None, context: str = "system", level: str = "INFO"):
     """记录审计日志"""
-    log_message = f"AUDIT: {message}"
+    if request:
+        client_info = get_client_info(request)
+        client_info_str = format_client_info(client_info)
+        log_message = f"AUDIT: {client_info_str} {message}"
+    else:
+        log_message = f"AUDIT: {message}"
+    
     logger.bind(context=context).info(log_message)
 
-def log_operation(message: str, level: str = "INFO"):
+def log_operation(message: str, request=None, level: str = "INFO"):
     """记录一般操作日志"""
-    if level.upper() == "DEBUG":
-        logger.debug(message)
-    elif level.upper() == "WARNING":
-        logger.warning(message)
-    elif level.upper() == "ERROR":
-        logger.error(message)
+    if request:
+        client_info = get_client_info(request)
+        client_info_str = format_client_info(client_info)
+        log_message = f"{client_info_str} {message}"
     else:
-        logger.info(message)
+        log_message = message
+    
+    if level.upper() == "DEBUG":
+        logger.debug(log_message)
+    elif level.upper() == "WARNING":
+        logger.warning(log_message)
+    elif level.upper() == "ERROR":
+        logger.error(log_message)
+    else:
+        logger.info(log_message)

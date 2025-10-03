@@ -4,78 +4,84 @@
 
 {% block extra_css %}
 <style>
-    .login-btn {
-        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        color: white;
-        border: none;
-    }
-    
-    .login-btn:hover {
-        background: linear-gradient(135deg, #38f9d7 0%, #43e97b 100%);
-        box-shadow: 0 8px 25px rgba(67, 233, 123, 0.4);
-        transform: translateY(-2px);
-    }
-    
-    .login-btn:active {
-        transform: translateY(0);
-    }
-    
-    /* 完全重写登录页面布局 */
-    body.login-page {
-        margin: 0;
-        padding: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)) !important;
-        overflow: hidden;
-        position: relative;
-    }
-    
-    body.login-page::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.08)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>');
-        opacity: 0.3;
-        z-index: -1;
-    }
-    
-    body.login-page::after {
-        content: '';
-        position: absolute;
-        width: 300%;
-        height: 300%;
-        background: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.08) 50%);
-        animation: bgFlow 30s linear infinite;
-        z-index: -2;
-    }
-    
-    .login-container {
-        width: 100%;
-        max-width: 450px;
-        margin: 0 auto;
+    /* 用户信息展示区域优化样式 */
+    .demo-account-info {
+        background: linear-gradient(135deg, #26a69a, #009688);
+        border-radius: 12px;
         padding: 20px;
+        margin: 20px 0;
+        color: white;
+        box-shadow: 0 5px 15px rgba(38, 166, 154, 0.3);
+        border: none;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
     }
     
-    .login-card {
-        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        border-radius: 16px;
-        border: 1px solid rgba(255,255,255,0.2);
-        padding: 2.5rem;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        transform: translateY(0);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    .demo-account-info:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(38, 166, 154, 0.4);
     }
     
-    .login-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    .demo-account-info::before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .demo-account-info::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: -15px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .demo-account-info .info-title {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .demo-account-info .info-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .demo-account-info .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .demo-account-info .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .demo-account-info .info-label {
+        font-weight: 500;
+    }
+    
+    .demo-account-info .info-value {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 2px 10px;
+        border-radius: 6px;
+        letter-spacing: 1px;
     }
 </style>
 {% endblock %}
@@ -83,7 +89,7 @@
 {% block content %}
 <body class="login-page">
     <div class="login-container">
-        <form method="post" action="{% url 'demo:login' %}" class="card login-card">
+        <form method="post" action="{% url 'demo:login' %}" class="login-card">
             {% csrf_token %}
             <div class="card-content">
                 <span class="card-title deep-purple-text text-darken-2">
@@ -92,14 +98,20 @@
                 </span>
                 
                 <!-- 用户信息展示区域 -->
-                <div class="card-panel teal lighten-4" style="margin: 20px 0;">
-                    <span class="black-text">
-                        <i class="material-icons" style="vertical-align: middle">info</i>
-                        演示账户信息:
-                    </span>
-                    <div style="margin-top: 10px; padding-left: 20px;">
-                        <div><strong>用户名:</strong> admin</div>
-                        <div><strong>密码:</strong> admin</div>
+                <div class="demo-account-info">
+                    <div class="info-title">
+                        <i class="material-icons">info</i>
+                        <span>演示账户信息</span>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-item">
+                            <span class="info-label">用户名:</span>
+                            <span class="info-value">admin</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">密码:</span>
+                            <span class="info-value">admin</span>
+                        </div>
                     </div>
                 </div>
                 
@@ -125,13 +137,14 @@
                 </div>
                 
                 <p class="left-align">
-                    <label>
+                    <label class="switch">
                         <input type="checkbox" class="filled-in" id="rememberMe" name="remember_me"/>
+                        <span class="lever"></span>
                         <span>记住我</span>
                     </label>
                 </p>
                 
-                <button class="btn auth-btn login-btn" type="submit">
+                <button class="login-btn" type="submit">
                     <i class="material-icons">send</i>
                     登录
                 </button>

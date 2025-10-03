@@ -38,7 +38,7 @@ body {
 }
 
 /* 登录/注册页面通用样式 */
-.auth-body {
+.auth-body, body.login-page {
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
     position: relative;
     overflow: hidden;
@@ -50,7 +50,7 @@ body {
     padding: 20px;
 }
 
-.auth-body::before {
+.auth-body::before, body.login-page::before {
     content: '';
     position: absolute;
     top: 0;
@@ -62,7 +62,7 @@ body {
     z-index: -1;
 }
 
-.auth-body::after {
+.auth-body::after, body.login-page::after {
     content: '';
     position: absolute;
     width: 300%;
@@ -82,7 +82,7 @@ body {
     }
 }
 
-.auth-card {
+.auth-card, .login-card {
     max-width: 450px;
     margin: auto;
     box-shadow: 0 20px 40px rgba(0,0,0,0.2);
@@ -93,11 +93,73 @@ body {
     backdrop-filter: blur(10px);
     transform: translateY(0);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: 100%;
 }
 
-.auth-card:hover {
+.auth-card:hover, .login-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+}
+
+.login-container {
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 登录按钮样式 */
+.login-btn {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    color: white;
+    border: none;
+    width: 100%;
+    border-radius: 10px;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.login-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.login-btn:hover {
+    background: linear-gradient(135deg, #38f9d7 0%, #43e97b 100%);
+    box-shadow: 0 8px 25px rgba(67, 233, 123, 0.4);
+    transform: translateY(-2px);
+}
+
+.login-btn:hover::before {
+    opacity: 1;
+}
+
+.login-btn:active {
+    transform: translateY(0);
+}
+
+.login-btn i {
+    margin-right: 0.8rem;
+    font-size: 1.3rem;
 }
 
 .auth-card .card-title {
@@ -414,4 +476,46 @@ a:hover {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+/* 表单元素动画 */
+.input-field input[type="text"],
+.input-field input[type="password"],
+.input-field input[type="email"] {
+    position: relative;
+    transition: all 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-field input[type="text"]:focus,
+.input-field input[type="password"]:focus,
+.input-field input[type="email"]:focus {
+    animation: pulse 0.5s ease;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+    }
+    50% {
+        box-shadow: 0 5px 30px rgba(102, 126, 234, 0.4);
+    }
+    100% {
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+    }
+}
+
+/* 卡片入场动画 */
+@keyframes cardEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.auth-card, .login-card {
+    animation: cardEntrance 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
 }

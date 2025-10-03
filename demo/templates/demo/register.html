@@ -2,88 +2,10 @@
 
 {% block title %}用户注册{% endblock %}
 
-{% block extra_css %}
-<style>
-    .register-btn {
-        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-        color: white;
-        border: none;
-    }
-    
-    .register-btn:hover {
-        background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
-        box-shadow: 0 8px 25px rgba(106, 17, 203, 0.4);
-        transform: translateY(-2px);
-    }
-    
-    .register-btn:active {
-        transform: translateY(0);
-    }
-    
-    /* 完全重写注册页面布局 */
-    body.register-page {
-        margin: 0;
-        padding: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)) !important;
-        overflow: hidden;
-        position: relative;
-    }
-    
-    body.register-page::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.08)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>');
-        opacity: 0.3;
-        z-index: -1;
-    }
-    
-    body.register-page::after {
-        content: '';
-        position: absolute;
-        width: 300%;
-        height: 300%;
-        background: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.08) 50%);
-        animation: bgFlow 30s linear infinite;
-        z-index: -2;
-    }
-    
-    .register-container {
-        width: 100%;
-        max-width: 450px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-    
-    .register-card {
-        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        border-radius: 16px;
-        border: 1px solid rgba(255,255,255,0.2);
-        padding: 2.5rem;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        transform: translateY(0);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    
-    .register-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<body class="register-page">
-    <div class="register-container">
-        <form method="post" class="card register-card">
+<body class="auth-body">
+    <div class="login-container">
+        <form method="post" class="auth-card">
             {% csrf_token %}
             <div class="card-content">
                 <span class="card-title deep-purple-text text-darken-2">
@@ -118,7 +40,7 @@
                     <span class="helper-text">请再次输入密码以确认</span>
                 </div>
                 
-                <button class="btn auth-btn register-btn" type="submit">
+                <button class="btn auth-btn" type="submit" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100);">
                     <i class="material-icons">send</i>
                     注册
                 </button>

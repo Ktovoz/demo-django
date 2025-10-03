@@ -13,7 +13,7 @@ from django.contrib.auth.models import Group
 import json
 
 # 导入日志模块
-from ..logger import logger
+from ..logger import logger, log_operation, log_audit
 
 
 @login_required(login_url='demo:login')
@@ -39,19 +39,19 @@ def group_create(request):
     try:
         data = json.loads(request.body)
         name = data.get('name')
-        logger.info(f"管理员 {request.user.username} 尝试创建用户组: {name}")
+        log_operation(f"管理员 {request.user.username} 尝试创建用户组: {name}", request)
         
         # 检查用户组名是否已存在
         if Group.objects.filter(name=name).exists():
-            logger.warning(f"用户组创建失败: {name} - 用户组名已存在")
+            log_operation(f"用户组创建失败: {name} - 用户组名已存在", request)
             return JsonResponse({'status': 'error', 'message': '用户组名已存在'}, status=400)
         
         # 创建用户组
         group = Group.objects.create(name=name)
-        logger.info(f"用户组创建成功: {name}")
+        log_audit(f"用户组创建成功: {name}", request, context="group_management")
         return JsonResponse({'status': 'success', 'message': '用户组创建成功'})
     except Exception as e:
-        logger.error(f"用户组创建失败: {name} - {str(e)}")
+        log_operation(f"用户组创建失败: {name} - {str(e)}", request, level="ERROR")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
@@ -82,18 +82,18 @@ def group_update(request, group_id):
         group = get_object_or_404(Group, pk=group_id)
         old_name = group.name
         name = data.get('name')
-        logger.info(f"管理员 {request.user.username} 尝试更新用户组: {old_name} -> {name}")
+        log_operation(f"管理员 {request.user.username} 尝试更新用户组: {old_name} -> {name}", request)
         
         # 检查新用户组名是否已存在（排除当前用户组）
         if Group.objects.exclude(pk=group_id).filter(name=name).exists():
-            logger.warning(f"用户组更新失败: {name} - 用户组名已存在")
+            log_operation(f"用户组更新失败: {name} - 用户组名已存在", request)
             return JsonResponse({'status': 'error', 'message': '用户组名已存在'}, status=400)
         
         # 更新用户组名称
         group.name = name
         group.save()
-        logger.info(f"用户组更新成功: {old_name} -> {name}")
+        log_audit(f"用户组更新成功: {old_name} -> {name}", request, context="group_management")
         return JsonResponse({'status': 'success', 'message': '用户组更新成功'})
     except Exception as e:
-        logger.error(f"用户组更新失败: {name} - {str(e)}")
+        log_operation(f"用户组更新失败: {name} - {str(e)}", request, level="ERROR")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

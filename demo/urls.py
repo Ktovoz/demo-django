@@ -8,6 +8,7 @@ app_name = 'demo'
 
 urlpatterns = [
     path('init/<str:password>/', system_views.init_system, name='init_system'),
+    path('test-logging/', system_views.test_logging, name='test_logging'),
     
     path('', auth_views.home, name='home'),
     path('login/', auth_views.login_view, name='login'),
