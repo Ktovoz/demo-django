@@ -40,6 +40,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 绑定密码输入事件
     bindPasswordEvents();
+
+    initViewSwitching();
 });
 
 // 绑定表格行事件
@@ -53,6 +55,26 @@ function bindTableRowEvents() {
         });
     });
 }
+
+// 添加表格行点击效果
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('table.highlight > tbody > tr').forEach(tr => {
+        tr.addEventListener('click', function(e) {
+            // 如果点击的不是按钮或链接，则添加选中效果
+            if (!e.target.closest('button, a, .btn, .btn-small')) {
+                // 移除其他行的选中状态
+                document.querySelectorAll('table.highlight > tbody > tr').forEach(otherTr => {
+                    if (otherTr !== this) {
+                        otherTr.classList.remove('selected');
+                    }
+                });
+                
+                // 切换当前行的选中状态
+                this.classList.toggle('selected');
+            }
+        });
+    });
+});
 
 // 绑定菜单切换事件
 function bindMenuToggleEvents() {
@@ -101,34 +123,62 @@ function bindPasswordEvents() {
 
 // 显示用户列表
 function showUserList(element) {
-    document.getElementById('userListView').style.display = 'block';
-    document.getElementById('groupListView').style.display = 'none';
-    
-    updateMenuActiveState(element);
-    
-    if (window.innerWidth < 992) {
-        document.getElementById('sideNav').classList.remove('active');
-        document.getElementById('menuToggle').classList.remove('active');
+    const userView = document.getElementById('userListView');
+    const groupView = document.getElementById('groupListView');
+
+    if (!userView || !groupView) {
+        return;
     }
-    
-    // 添加淡入动画
-    document.getElementById('userListView').classList.add('fade-in-up');
+
+    userView.style.display = 'block';
+    groupView.style.display = 'none';
+    userView.classList.remove('hidden');
+    groupView.classList.add('hidden');
+
+    updateMenuActiveState(element);
+
+    if (window.innerWidth < 992) {
+        const sideNav = document.getElementById('sideNav');
+        const menuToggle = document.getElementById('menuToggle');
+        if (sideNav) {
+            sideNav.classList.remove('active');
+        }
+        if (menuToggle) {
+            menuToggle.classList.remove('active');
+        }
+    }
+
+    userView.classList.add('fade-in-up');
 }
 
 // 显示用户组列表
 function showGroupList(element) {
-    document.getElementById('userListView').style.display = 'none';
-    document.getElementById('groupListView').style.display = 'block';
-    
-    updateMenuActiveState(element);
-    
-    if (window.innerWidth < 992) {
-        document.getElementById('sideNav').classList.remove('active');
-        document.getElementById('menuToggle').classList.remove('active');
+    const userView = document.getElementById('userListView');
+    const groupView = document.getElementById('groupListView');
+
+    if (!userView || !groupView) {
+        return;
     }
-    
-    // 添加淡入动画
-    document.getElementById('groupListView').classList.add('fade-in-up');
+
+    userView.style.display = 'none';
+    groupView.style.display = 'block';
+    userView.classList.add('hidden');
+    groupView.classList.remove('hidden');
+
+    updateMenuActiveState(element);
+
+    if (window.innerWidth < 992) {
+        const sideNav = document.getElementById('sideNav');
+        const menuToggle = document.getElementById('menuToggle');
+        if (sideNav) {
+            sideNav.classList.remove('active');
+        }
+        if (menuToggle) {
+            menuToggle.classList.remove('active');
+        }
+    }
+
+    groupView.classList.add('fade-in-up');
 }
 
 // 更新菜单激活状态
@@ -136,11 +186,71 @@ function updateMenuActiveState(element) {
     document.querySelectorAll('.collection-item').forEach(item => {
         item.classList.remove('active');
     });
-    
+
     if (element) {
         element.classList.add('active');
+        syncViewPills(element.dataset.view);
     }
 }
+function initViewSwitching() {
+    const viewPills = document.querySelectorAll('.view-pill');
+    const searchInput = document.getElementById('userSearchInput');
+
+    viewPills.forEach(pill => {
+        pill.addEventListener('click', function (evt) {
+            evt.preventDefault();
+            toggleContentView(this.dataset.view);
+        });
+    });
+
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(function () {
+            filterUserTable(this.value);
+        }, 200));
+    }
+
+    const activeSidebar = document.querySelector('.menu-collection .collection-item.active');
+    if (activeSidebar) {
+        syncViewPills(activeSidebar.dataset.view);
+    }
+}
+
+function toggleContentView(viewName) {
+    const selector = '.menu-collection .collection-item[data-view="' + viewName + '"]';
+    const sidebarTarget = document.querySelector(selector);
+
+    if (viewName === 'groupListView') {
+        showGroupList(sidebarTarget);
+    } else {
+        showUserList(sidebarTarget);
+    }
+
+    syncViewPills(viewName);
+}
+
+function syncViewPills(viewName) {
+    if (!viewName) {
+        return;
+    }
+
+    document.querySelectorAll('.view-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.view === viewName);
+    });
+}
+
+function filterUserTable(keyword) {
+    const rows = document.querySelectorAll('#userTableBody tr');
+    if (!rows.length) {
+        return;
+    }
+
+    const normalized = (keyword || '').trim().toLowerCase();
+    rows.forEach(row => {
+        const content = row.innerText.toLowerCase();
+        row.style.display = normalized ? (content.includes(normalized) ? '' : 'none') : '';
+    });
+}
+
 
 // 显示创建用户模态框
 function showCreateUserModal() {
@@ -471,59 +581,102 @@ function removeUserFromGroup(userId) {
 }
 
 // 刷新用户列表
-function refreshUserList() {
-    const refreshBtn = event.target;
-    const originalText = refreshBtn.innerHTML;
-    showLoading(refreshBtn);
-    
+function refreshUserList(evt) {
+    if (evt && typeof evt.preventDefault === 'function') {
+        evt.preventDefault();
+    }
+
+    const refreshBtn = evt ? (evt.currentTarget || evt.target) : null;
+    const originalText = refreshBtn ? refreshBtn.innerHTML : '';
+
+    if (refreshBtn) {
+        showLoading(refreshBtn);
+    }
+
+    const defaultName = '\u672a\u586b\u5199\u59d3\u540d';
+    const defaultGroup = '\u672a\u5206\u7ec4';
+    const statusNormal = '\u6b63\u5e38';
+    const statusInactive = '\u7981\u7528';
+    const toastSuccess = '\u5217\u8868\u5237\u65b0\u6210\u529f';
+    const toastFail = '\u5237\u65b0\u5217\u8868\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5';
+    const hintMessage = '\u7528\u6237\u5217\u8868\u5df2\u5237\u65b0';
+    const refreshFailLabel = '\u5237\u65b0\u5931\u8d25';
+
     sendRequest('/users/api/')
         .then(data => {
             const tbody = document.getElementById('userTableBody');
+            if (!tbody) {
+                return;
+            }
+
             tbody.innerHTML = '';
-            
+
             data.users.forEach(user => {
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-user-id', user.id);
-                let btnHtml = '';
-                
+
+                const subtitle = user.full_name ? user.full_name : defaultName;
+                const groupName = user.group_name ? user.group_name : defaultGroup;
+
+                let actionHtml = '';
+
                 if (hasChangeUserPerm) {
-                    btnHtml += `<a class="waves-effect waves-light btn-small" onclick="showEditUserModal(${user.id})">
+                    actionHtml += `<a class="waves-effect waves-light btn-small" onclick="showEditUserModal(${user.id})" title="\u7f16\u8f91\u7528\u6237">
                         <i class="material-icons">edit</i>
                     </a>
-                    <a class="waves-effect waves-light btn-small orange" onclick="showChangePasswordModal(${user.id})">
+                    <a class="waves-effect waves-light btn-small orange" onclick="showChangePasswordModal(${user.id})" title="\u4fee\u6539\u5bc6\u7801">
                         <i class="material-icons">lock</i>
                     </a>`;
                 }
-                
+
                 if (hasDeleteUserPerm && user.id != currentUserId) {
-                    btnHtml += `<a class="waves-effect waves-light btn-small red" onclick="deleteUser(${user.id})">
+                    actionHtml += `<a class="waves-effect waves-light btn-small red" onclick="deleteUser(${user.id})" title="\u5220\u9664\u7528\u6237">
                         <i class="material-icons">delete</i>
                     </a>`;
                 }
-                
+
                 tr.innerHTML = `
-                    <td>${user.username}</td>
+                    <td>
+                        <div class="table-cell-primary">
+                            <span class="cell-title">${user.username}</span>
+                            <span class="cell-subtitle">${subtitle}</span>
+                        </div>
+                    </td>
                     <td>${user.email || '-'}</td>
-                    <td>${user.group_name || '无'}</td>
+                    <td>${groupName}</td>
                     <td>
                         <span class="badge ${user.is_active ? 'active' : 'inactive'}">
-                            ${user.is_active ? '正常' : '禁用'}
+                            ${user.is_active ? statusNormal : statusInactive}
                         </span>
                     </td>
-                    <td>${btnHtml}</td>
+                    <td class="align-right">
+                        <div class="table-actions">
+                            ${actionHtml.trim()}
+                        </div>
+                    </td>
                 `;
+
                 tbody.appendChild(tr);
             });
-            
-            showToast('列表刷新成功', 'rounded green');
-            showHint('用户列表已刷新');
+
+            bindTableRowEvents();
+
+            const searchInput = document.getElementById('userSearchInput');
+            if (searchInput && searchInput.value.trim()) {
+                filterUserTable(searchInput.value);
+            }
+
+            showToast(toastSuccess, 'rounded green');
+            showHint(hintMessage);
         })
         .catch(error => {
-            console.error('刷新失败:', error);
-            showToast('刷新列表失败，请稍后重试', 'rounded red');
+            console.error(`${refreshFailLabel}:`, error);
+            showToast(toastFail, 'rounded red');
         })
         .finally(() => {
-            hideLoading(refreshBtn, originalText);
+            if (refreshBtn) {
+                hideLoading(refreshBtn, originalText);
+            }
         });
 }
 

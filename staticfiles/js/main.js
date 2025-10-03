@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
     M.Tooltip.init(tooltips);
 });
 
+window.hintTimer = null;
+
 // 显示提示信息
 function showToast(message, classes = 'rounded') {
     M.toast({html: message, classes: classes, displayLength: 3000});
@@ -25,22 +27,34 @@ function showToast(message, classes = 'rounded') {
 // 显示操作提示
 function showHint(message) {
     const hintEl = document.getElementById('actionHint');
-    if (hintEl) {
-        document.getElementById('hintContent').textContent = message;
-        hintEl.classList.add('show');
-        
-        // 5秒后自动关闭
-        setTimeout(() => {
-            closeHint();
-        }, 5000);
+    const hintContent = document.getElementById('hintContent');
+
+    if (!hintEl || !hintContent) {
+        return;
     }
+
+    hintContent.textContent = message;
+    hintEl.classList.add('active');
+
+    if (window.hintTimer) {
+        clearTimeout(window.hintTimer);
+    }
+
+    window.hintTimer = setTimeout(() => {
+        closeHint();
+    }, 5000);
 }
 
 // 关闭操作提示
 function closeHint() {
     const hintEl = document.getElementById('actionHint');
     if (hintEl) {
-        hintEl.classList.remove('show');
+        hintEl.classList.remove('active');
+    }
+
+    if (window.hintTimer) {
+        clearTimeout(window.hintTimer);
+        window.hintTimer = null;
     }
 }
 
