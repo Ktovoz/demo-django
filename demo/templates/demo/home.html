@@ -1,7 +1,7 @@
 {% extends 'demo/base.html' %}
 {% load static %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ title|default:"User Management Console" }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/user-management.css' %}">
@@ -9,17 +9,17 @@
 
 {% block content %}
 <div class="layout-shell">
-    <div class="mobile-menu-btn hide-on-large-only" id="menuToggle">
+    <button class="mobile-menu-btn hide-on-large-only" id="menuToggle" type="button" aria-label="Open navigation">
         <i class="material-icons">menu</i>
-    </div>
+    </button>
 
-    <nav class="sidebar" id="sideNav">
+    <nav class="sidebar" id="sideNav" aria-label="Primary navigation">
         <div class="sidebar-brand glass-card">
             <div class="brand-icon">
                 <i class="material-icons">dashboard_customize</i>
             </div>
             <div class="brand-copy">
-                <span class="brand-title">控制中心</span>
+                <span class="brand-title">Control Center</span>
                 <span class="brand-subtitle">User Console</span>
             </div>
         </div>
@@ -31,295 +31,375 @@
                 </div>
                 <div class="identity-meta">
                     <h6 class="user-name">{{ user.get_full_name|default:user.username }}</h6>
-                    <div class="user-group">{{ user.groups.all.0.name|default:"无用户组" }}</div>
+                    <div class="user-group">{{ user.groups.all.0.name|default:"No group assigned" }}</div>
                     <div class="user-login-time">
                         <i class="material-icons tiny">access_time</i>
-                        <span>最近登录 {{ user.last_login|date:"Y-m-d H:i" }}</span>
+                        <span>
+                            Last sign in:
+                            {% if user.last_login %}
+                                {{ user.last_login|date:"Y-m-d H:i" }}
+                            {% else %}
+                                Not recorded
+                            {% endif %}
+                        </span>
                     </div>
                 </div>
             </div>
             <form method="post" action="{% url 'demo:logout' %}" class="logout-form">
                 {% csrf_token %}
-                <button class="btn-floating waves-effect waves-light tooltipped" data-tooltip="退出登录" type="submit">
+                <button class="btn-floating waves-effect waves-light tooltipped"
+                        data-tooltip="Sign out"
+                        aria-label="Sign out"
+                        type="submit">
                     <i class="material-icons">exit_to_app</i>
                 </button>
             </form>
         </div>
 
         <div class="sidebar-menu">
-            <h6 class="menu-title">系统菜单</h6>
-            <ul class="collection menu-collection">
-                <li class="collection-item waves-effect active" onclick="showUserList(this)" data-view="userListView">
-                    <div class="menu-item-icon">
-                        <i class="material-icons">people</i>
-                    </div>
-                    <div class="menu-item-copy">
-                        <span>用户列表</span>
-                        <small>查看并管理系统用户</small>
-                    </div>
-                    <i class="material-icons trailing">chevron_right</i>
+            <h6 class="menu-title">Workspace</h6>
+            <ul class="collection menu-collection" role="tablist" aria-label="Workspace views">
+                <li class="collection-item is-active">
+                    <button type="button"
+                            class="menu-item-trigger waves-effect active"
+                            data-action="switch-view"
+                            data-target="userListView"
+                            aria-controls="userListView"
+                            aria-pressed="true">
+                        <span class="menu-item-icon">
+                            <i class="material-icons">people</i>
+                        </span>
+                        <span class="menu-item-copy">
+                            <span>User directory</span>
+                            <small>Browse and manage every account</small>
+                        </span>
+                        <i class="material-icons trailing">chevron_right</i>
+                    </button>
                 </li>
-                <li class="collection-item waves-effect" onclick="showGroupList(this)" data-view="groupListView">
-                    <div class="menu-item-icon">
-                        <i class="material-icons">group_work</i>
-                    </div>
-                    <div class="menu-item-copy">
-                        <span>用户组管理</span>
-                        <small>维护权限与分组</small>
-                    </div>
-                    <i class="material-icons trailing">chevron_right</i>
+                <li class="collection-item">
+                    <button type="button"
+                            class="menu-item-trigger waves-effect"
+                            data-action="switch-view"
+                            data-target="groupListView"
+                            aria-controls="groupListView"
+                            aria-pressed="false">
+                        <span class="menu-item-icon">
+                            <i class="material-icons">group_work</i>
+                        </span>
+                        <span class="menu-item-copy">
+                            <span>Group roles</span>
+                            <small>Maintain permissions and membership</small>
+                        </span>
+                        <i class="material-icons trailing">chevron_right</i>
+                    </button>
                 </li>
             </ul>
         </div>
 
         <div class="sidebar-tip glass-card">
-            <h6>温馨提示</h6>
-            <p>善用右侧工具栏的快捷操作，可更高效地维护用户与权限。</p>
+            <h6>Pro tip</h6>
+            <p>Use the quick actions and search tools on the right to keep accounts in sync faster.</p>
         </div>
     </nav>
 
-    <main class="main-content">
-        <section class="dashboard-hero glass-card">
-            <div class="hero-copy">
-                <span class="hero-badge">
+    <main class="main-content" role="main">
+        <section class="welcome-panel glass-card">
+            <div class="welcome-primary">
+                <span class="panel-badge">
                     <i class="material-icons tiny">verified_user</i>
-                    用户管理中心
+                    User Management Hub
                 </span>
-                <h2>欢迎回来，{{ user.get_full_name|default:user.username }}！</h2>
-                <p>集中查看用户、分组与权限状况，保障团队协作安全顺畅。</p>
-                <div class="hero-tags">
-                    <span><i class="material-icons tiny">flash_on</i> 实时刷新</span>
-                    <span><i class="material-icons tiny">lock_open</i> 权限可视化</span>
-                    <span><i class="material-icons tiny">devices</i> 自适应布局</span>
+                <h2 class="panel-title">Welcome back, {{ user.get_full_name|default:user.username }}!</h2>
+                <p class="panel-copy">Review account status, group assignments, and permissions in one streamlined workspace.</p>
+                <div class="metric-row">
+                    <div class="metric-pill">
+                        <span class="metric-label">Total users</span>
+                        <span class="metric-value">{{ user_count }}</span>
+                    </div>
+                    <div class="metric-pill">
+                        <span class="metric-label">Groups</span>
+                        <span class="metric-value">{{ group_count }}</span>
+                    </div>
+                    <div class="metric-pill">
+                        <span class="metric-label">Your last login</span>
+                        <span class="metric-value">
+                            {% if request.user.last_login %}
+                                {{ request.user.last_login|date:"m-d H:i" }}
+                            {% else %}
+                                &ndash;
+                            {% endif %}
+                        </span>
+                    </div>
                 </div>
             </div>
-            <div class="hero-actions">
-                {% if perms.auth.add_user %}
-                <a class="waves-effect waves-light btn gradient-primary" onclick="showCreateUserModal()">
-                    <i class="material-icons left">person_add</i>快速新增
-                </a>
-                {% endif %}
-                <a class="waves-effect waves-light btn-flat hero-secondary" onclick="refreshUserList(event)">
-                    <i class="material-icons left">refresh</i>刷新数据
-                </a>
+            <div class="welcome-secondary">
+                <div class="health-card">
+                    <div class="health-headline">
+                        <span class="health-title">Checklist</span>
+                        <span class="health-status">
+                            <i class="material-icons tiny">circle</i>
+                            Secure
+                        </span>
+                    </div>
+                    <ul class="health-list">
+                        <li><i class="material-icons tiny">check_circle</i> Audit role assignments every month</li>
+                        <li><i class="material-icons tiny">check_circle</i> Rotate passwords for privileged accounts</li>
+                        <li><i class="material-icons tiny">check_circle</i> Monitor login anomalies</li>
+                    </ul>
+                </div>
+                <div class="illustration-card" aria-hidden="true">
+                    <div class="glow glow-1"></div>
+                    <div class="glow glow-2"></div>
+                    <span class="illustration-copy">Stay aligned &amp; compliant</span>
+                </div>
             </div>
         </section>
 
-        <section class="stats-grid">
-            <article class="stat-card stat-users glass-card">
-                <div class="stat-icon">
-                    <i class="material-icons">groups</i>
-                </div>
-                <div class="stat-content">
-                    <span class="stat-label">用户总数</span>
-                    <span class="stat-value">{{ users|length }}</span>
-                    <span class="stat-hint">包含正常与禁用账号</span>
-                </div>
-            </article>
-            <article class="stat-card stat-groups glass-card">
-                <div class="stat-icon">
-                    <i class="material-icons">account_tree</i>
-                </div>
-                <div class="stat-content">
-                    <span class="stat-label">用户组</span>
-                    <span class="stat-value">{{ groups|length }}</span>
-                    <span class="stat-hint">统一维护权限集合</span>
-                </div>
-            </article>
-            <article class="stat-card stat-last-login glass-card">
-                <div class="stat-icon">
-                    <i class="material-icons">schedule</i>
-                </div>
-                <div class="stat-content">
-                    <span class="stat-label">最近登录</span>
-                    <span class="stat-value">{{ user.last_login|date:"m-d H:i" }}</span>
-                    <span class="stat-hint">系统记录了你的最新访问时间</span>
-                </div>
-            </article>
-        </section>
-
-        <section class="content-toolbar glass-card" id="contentToolbar">
-            <div class="view-switch">
-                <button type="button" class="view-pill active" data-view="userListView">
+        <section class="toolbar glass-card" id="commandToolbar">
+            <div class="toolbar-section view-controls" role="tablist">
+                <button type="button" class="view-toggle active" id="userViewTab" role="tab" data-view="userListView" aria-controls="userListView" aria-selected="true">
                     <i class="material-icons tiny">table_rows</i>
-                    用户视图
+                    Users
                 </button>
-                <button type="button" class="view-pill" data-view="groupListView">
+                <button type="button" class="view-toggle" id="groupViewTab" role="tab" data-view="groupListView" aria-controls="groupListView" aria-selected="false">
                     <i class="material-icons tiny">category</i>
-                    用户组视图
+                    Groups
                 </button>
             </div>
-            <div class="toolbar-divider"></div>
-            <div class="search-field">
-                <i class="material-icons">search</i>
-                <input type="text" id="userSearchInput" placeholder="搜索用户名或邮箱">
+            <div class="toolbar-section search-controls">
+                <label class="search-field" for="userSearchInput">
+                    <i class="material-icons">search</i>
+                    <input type="text" id="userSearchInput" placeholder="Search by username or email" aria-label="Search user list">
+                </label>
+            </div>
+            <div class="toolbar-section action-controls">
+                {% if perms.auth.add_group %}
+                <button type="button" class="btn chip-btn" data-action="switch-view" data-target="groupListView" aria-controls="groupListView">
+                    <i class="material-icons left">shield</i>Manage groups
+                </button>
+                {% endif %}
+                {% if perms.auth.add_user %}
+                <button type="button" class="btn accent-btn" data-action="open-create-user">
+                    <i class="material-icons left">person_add</i>New user
+                </button>
+                {% endif %}
+                <button type="button" class="icon-btn" data-action="refresh-users" aria-label="Refresh data">
+                    <i class="material-icons">refresh</i>
+                </button>
             </div>
         </section>
 
-        <div class="action-hint glass-card" id="actionHint">
-            <span class="close" onclick="closeHint()">×</span>
+        <section class="summary-grid">
+            <article class="summary-card glass-card">
+                <div class="summary-icon primary"><i class="material-icons">groups</i></div>
+                <div class="summary-copy">
+                    <span class="summary-title">Active accounts</span>
+                    <span class="summary-value">{{ active_user_count }}</span>
+                    <p class="summary-note">Monitor sign-ins and disable unused accounts promptly.</p>
+                </div>
+            </article>
+            <article class="summary-card glass-card">
+                <div class="summary-icon accent"><i class="material-icons">account_tree</i></div>
+                <div class="summary-copy">
+                    <span class="summary-title">Permission sets</span>
+                    <span class="summary-value">{{ group_count }}</span>
+                    <p class="summary-note">Keep access scoped to the minimum required roles.</p>
+                </div>
+            </article>
+            <article class="summary-card glass-card">
+                <div class="summary-icon warning"><i class="material-icons">schedule</i></div>
+                <div class="summary-copy">
+                    <span class="summary-title">Latest login</span>
+                    <span class="summary-value">
+                        {% if user.last_login %}
+                            {{ user.last_login|date:"m-d H:i" }}
+                        {% else %}
+                            Not recorded
+                        {% endif %}
+                    </span>
+                    <p class="summary-note">Encourage MFA for privileged operators.</p>
+                </div>
+            </article>
+        </section>
+
+        <div class="action-hint glass-card" id="actionHint" role="status" aria-live="polite">
+            <button class="close" type="button" data-action="dismiss-hint" aria-label="Dismiss hint">&times;</button>
             <p id="hintContent"></p>
         </div>
 
-        <div class="content-card glass-card" id="userListView">
-            <div class="section-header">
+        <section class="data-panel glass-card" id="userListView" role="tabpanel" aria-labelledby="userViewTab" aria-hidden="false">
+            <header class="panel-header">
                 <div>
-                    <h4 class="header">用户列表</h4>
-                    <p class="section-subtitle">按用户名、邮箱或所属用户组进行查看</p>
+                    <h3 class="panel-heading">User directory</h3>
+                    <p class="panel-subtitle">Filter by username, email address, or group membership.</p>
                 </div>
-                <div class="section-actions">
+                <div class="panel-actions">
                     {% if perms.auth.add_user %}
-                    <a class="waves-effect waves-light btn scale-in" onclick="showCreateUserModal()">
-                        <i class="material-icons left">person_add</i>新增用户
-                    </a>
+                    <button type="button" class="btn primary-btn" data-action="open-create-user">
+                        <i class="material-icons left">person_add</i>Add user
+                    </button>
                     {% endif %}
-                    <a class="waves-effect waves-light btn outline" onclick="refreshUserList(event)">
-                        <i class="material-icons left">refresh</i>刷新
-                    </a>
+                    <button type="button" class="btn ghost-btn" data-action="refresh-users">
+                        <i class="material-icons left">refresh</i>Refresh
+                    </button>
                 </div>
-            </div>
+            </header>
 
             <table class="highlight responsive-table elevated-table" id="userTable">
                 <thead>
                     <tr>
-                        <th>用户名</th>
-                        <th>邮箱</th>
-                        <th>用户组</th>
-                        <th>状态</th>
-                        <th class="align-right">操作</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Group</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="align-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="userTableBody">
-                    {% for user in users %}
-                    <tr data-user-id="{{ user.id }}">
+                    {% for member in users %}
+                    <tr data-user-id="{{ member.id }}">
                         <td>
                             <div class="table-cell-primary">
-                                <span class="cell-title">{{ user.username }}</span>
-                                <span class="cell-subtitle">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}未填写姓名{% endif %}</span>
+                                <span class="cell-title">{{ member.username }}</span>
+                                <span class="cell-subtitle">
+                                    {% if member.get_full_name %}
+                                        {{ member.get_full_name }}
+                                    {% else %}
+                                        Name not provided
+                                    {% endif %}
+                                </span>
                             </div>
                         </td>
-                        <td>{{ user.email|default:"-" }}</td>
-                        <td>{{ user.groups.all.0.name|default:"未分组" }}</td>
+                        <td>{{ member.email|default:"-" }}</td>
+                        <td>{{ member.groups.all.0.name|default:"Unassigned" }}</td>
                         <td>
-                            {% if user.is_active %}
-                            <span class="badge active">正常</span>
+                            {% if member.is_active %}
+                            <span class="badge active">Active</span>
                             {% else %}
-                            <span class="badge inactive">禁用</span>
+                            <span class="badge inactive">Suspended</span>
                             {% endif %}
                         </td>
                         <td class="align-right">
-                            <div class="table-actions">
+                            <div class="table-actions" role="group" aria-label="Row actions">
                                 {% if perms.auth.change_user %}
-                                <a class="waves-effect waves-light btn-small" onclick="showEditUserModal({{ user.id|escapejs }})" title="编辑用户">
+                                <button type="button" class="icon-btn" data-action="edit-user" data-user-id="{{ member.id }}" title="Edit user">
                                     <i class="material-icons">edit</i>
-                                </a>
-                                <a class="waves-effect waves-light btn-small orange" onclick="showChangePasswordModal({{ user.id|escapejs }})" title="修改密码">
+                                </button>
+                                <button type="button" class="icon-btn warning" data-action="reset-password" data-user-id="{{ member.id }}" title="Reset password">
                                     <i class="material-icons">lock</i>
-                                </a>
+                                </button>
                                 {% endif %}
-                                {% if perms.auth.delete_user and user.id != request.user.id %}
-                                <a class="waves-effect waves-light btn-small red" onclick="deleteUser({{ user.id|escapejs }})" title="删除用户">
+                                {% if perms.auth.delete_user and member.id != request.user.id %}
+                                <button type="button" class="icon-btn danger" data-action="delete-user" data-user-id="{{ member.id }}" title="Delete user">
                                     <i class="material-icons">delete</i>
-                                </a>
+                                </button>
                                 {% endif %}
                             </div>
                         </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="empty-row">
+                        <td colspan="5">No user accounts found</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
+        </section>
 
-        <div class="content-card glass-card hidden" id="groupListView">
-            <div class="section-header">
+        <section class="data-panel glass-card hidden" id="groupListView" role="tabpanel" aria-labelledby="groupViewTab" aria-hidden="true">
+            <header class="panel-header">
                 <div>
-                    <h4 class="header">用户组管理</h4>
-                    <p class="section-subtitle">为团队成员分配角色与权限边界</p>
+                    <h3 class="panel-heading">Group roles</h3>
+                    <p class="panel-subtitle">Assign responsibilities and guardrails for every team.</p>
                 </div>
-            </div>
+            </header>
 
             <table class="highlight responsive-table elevated-table">
                 <thead>
                     <tr>
-                        <th>组名</th>
-                        <th>成员数量</th>
-                        <th class="align-right">操作</th>
+                        <th scope="col">Group name</th>
+                        <th scope="col">Members</th>
+                        <th scope="col" class="align-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="groupTableBody">
-                    {% for group in groups %}
+                    {% for role in groups %}
                     <tr>
                         <td>
                             <div class="table-cell-primary">
-                                <span class="cell-title">{{ group.name }}</span>
-                                <span class="cell-subtitle">ID: {{ group.id }}</span>
+                                <span class="cell-title">{{ role.name }}</span>
+                                <span class="cell-subtitle">ID: {{ role.id }}</span>
                             </div>
                         </td>
-                        <td>{{ group.user_set.count }}</td>
+                        <td>{{ role.member_count }}</td>
                         <td class="align-right">
-                            <a class="waves-effect waves-light btn-small" onclick="showGroupMembers({{ group.id }})">
-                                <i class="material-icons left">group</i>查看成员
-                            </a>
+                            <button type="button" class="btn ghost-btn" data-action="show-group-members" data-group-id="{{ role.id }}">
+                                <i class="material-icons left">group</i>View members
+                            </button>
                         </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="empty-row">
+                        <td colspan="3">No groups available</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
+        </section>
     </main>
 </div>
 
-<div id="userModal" class="modal glass-modal">
+<div id="userModal" class="modal glass-modal" aria-hidden="true" aria-labelledby="userModalTitle">
     <div class="modal-header">
-        <h5 id="userModalTitle">编辑用户</h5>
+        <h5 id="userModalTitle">Edit user</h5>
     </div>
     <div class="modal-content">
         <form id="userForm">
             {% csrf_token %}
             <input type="hidden" id="userId">
             <div class="input-field">
-                <input type="text" id="username" required>
-                <label for="username">用户名</label>
-                <span class="helper-text">请输入用户名</span>
+                <input type="text" id="username" required data-initial-focus="true">
+                <label for="username">Username</label>
+                <span class="helper-text">Provide a unique username.</span>
             </div>
             <div class="input-field">
                 <input type="email" id="email">
-                <label for="email">邮箱</label>
-                <span class="helper-text">请输入有效的邮箱地址</span>
+                <label for="email">Email</label>
+                <span class="helper-text">Optional but recommended for notifications.</span>
             </div>
             <div class="input-field" id="passwordGroup">
                 <input type="password" id="password">
-                <label for="password">密码</label>
-                <span class="helper-text">创建用户时必填，编辑用户时留空表示不修改密码</span>
+                <label for="password">Password</label>
+                <span class="helper-text">Required when creating a user. Leave blank to keep the current password.</span>
             </div>
             <div class="input-field">
                 <select id="userGroup">
-                    <option value="">选择用户组</option>
-                    {% for group in groups %}
-                    <option value="{{ group.id }}">{{ group.name }}</option>
+                    <option value="">Select a group</option>
+                    {% for role in groups %}
+                    <option value="{{ role.id }}">{{ role.name }}</option>
                     {% endfor %}
                 </select>
-                <label>用户组</label>
+                <label>Group</label>
             </div>
             <div class="switch">
                 <label>
-                    禁用
+                    Suspend
                     <input type="checkbox" id="isActive" checked>
                     <span class="lever"></span>
-                    正常
+                    Active
                 </label>
             </div>
         </form>
     </div>
     <div class="modal-footer">
-        <a class="modal-close waves-effect waves-light btn-flat">取消</a>
-        <a class="waves-effect waves-light btn" onclick="saveUser()">保存</a>
+        <button type="button" class="modal-close waves-effect waves-light btn-flat" data-modal-close="true">Cancel</button>
+        <button type="button" class="waves-effect waves-light btn" data-action="save-user">Save</button>
     </div>
 </div>
 
-<div id="passwordModal" class="modal glass-modal">
+<div id="passwordModal" class="modal glass-modal" aria-hidden="true" aria-labelledby="passwordModalTitle">
     <div class="modal-header">
-        <h5 id="passwordModalTitle">修改密码</h5>
+        <h5 id="passwordModalTitle">Reset password</h5>
     </div>
     <div class="modal-content">
         <form id="passwordForm">
@@ -328,35 +408,35 @@
             {% if not user.is_superuser %}
             <div class="input-field" id="oldPasswordGroup">
                 <input type="password" id="oldPassword" required>
-                <label for="oldPassword">旧密码</label>
-                <span class="helper-text">请输入当前密码</span>
+                <label for="oldPassword">Current password</label>
+                <span class="helper-text">Needed when you reset your own password.</span>
             </div>
             {% endif %}
             <div class="input-field">
                 <input type="password" id="newPassword" required>
-                <label for="newPassword">新密码</label>
-                <span class="helper-text">请输入新密码</span>
+                <label for="newPassword">New password</label>
+                <span class="helper-text">Use a mix of upper and lower case letters, numbers, and symbols.</span>
             </div>
         </form>
     </div>
     <div class="modal-footer">
-        <a class="modal-close waves-effect waves-light btn-flat">取消</a>
-        <a class="waves-effect waves-light btn" onclick="savePassword()">保存</a>
+        <button type="button" class="modal-close waves-effect waves-light btn-flat" data-modal-close="true">Cancel</button>
+        <button type="button" class="waves-effect waves-light btn" data-action="save-password">Save</button>
     </div>
 </div>
 
-<div id="groupMembersModal" class="modal modal-fixed-footer glass-modal">
+<div id="groupMembersModal" class="modal modal-fixed-footer glass-modal" aria-hidden="true" aria-labelledby="groupMembersModalTitle">
     <div class="modal-header">
-        <h5 id="groupMembersModalTitle">用户组成员</h5>
+        <h5 id="groupMembersModalTitle">Group members</h5>
     </div>
     <div class="modal-content">
         <table class="highlight elevated-table">
             <thead>
                 <tr>
-                    <th>用户名</th>
-                    <th>邮箱</th>
-                    <th>状态</th>
-                    <th>操作</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
                 </tr>
             </thead>
             <tbody id="groupMembersTableBody"></tbody>
@@ -366,33 +446,28 @@
         <div class="row compact-row">
             <div class="input-field col s12">
                 <select id="userToAdd">
-                    <option value="">选择用户...</option>
+                    <option value="">Select a user...</option>
                 </select>
-                <label>添加用户到组</label>
+                <label>Add user to group</label>
             </div>
             <div class="col s12 align-right">
-                <a class="waves-effect waves-light btn" onclick="addUserToGroup()">
-                    <i class="material-icons left">person_add</i>添加
-                </a>
+                <button type="button" class="waves-effect waves-light btn" data-action="add-user-to-group">
+                    <i class="material-icons left">person_add</i>Add
+                </button>
             </div>
         </div>
         {% endif %}
     </div>
     <div class="modal-footer">
-        <a class="modal-close waves-effect waves-light btn-flat">取消</a>
-        <a class="waves-effect waves-light btn" onclick="saveGroupMembers()">保存</a>
+        <button type="button" class="modal-close waves-effect waves-light btn-flat" data-modal-close="true">Close</button>
+        <button type="button" class="waves-effect waves-light btn" data-action="save-group-members">Save</button>
     </div>
 </div>
-
-<script>
-    currentUserId = {{ request.user.id }};
-    currentUserGroup = '{{ user.groups.all.0.name|escapejs }}';
-    currentUserName = '{{ user.username|escapejs }}';
-    hasChangeUserPerm = {% if perms.auth.change_user %}true{% else %}false{% endif %};
-    hasDeleteUserPerm = {% if perms.auth.delete_user %}true{% else %}false{% endif %};
-</script>
 {% endblock %}
 
 {% block extra_js %}
+<script>
+    window.dashboardState = JSON.parse('{{ dashboard_state_json|escapejs }}');
+</script>
 <script src="{% static 'js/user-management.js' %}"></script>
 {% endblock %}

@@ -1,0 +1,67 @@
+﻿{% extends 'demo/base.html' %}
+{% load static %}
+
+{% block title %}{{ title|default:'User Detail' }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/user-management.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="layout-shell" style="justify-content:center;">
+    <main class="main-content" style="max-width:720px;">
+        <section class="dashboard-hero glass-card" style="flex-direction:column;align-items:flex-start;gap:16px;">
+            <span class="hero-badge">
+                <i class="material-icons tiny">person</i>
+                User detail snapshot
+            </span>
+            <h2>{{ user_detail.get_full_name|default:user_detail.username }}</h2>
+            <p class="section-subtitle">Review account basics for {{ user_detail.username }}.</p>
+            <div class="hero-tags">
+                <span><i class="material-icons tiny">email</i> {{ user_detail.email|default:'No email on file' }}</span>
+                <span><i class="material-icons tiny">lock</i> {% if user_detail.is_active %}Active{% else %}Suspended{% endif %}</span>
+                <span><i class="material-icons tiny">event</i> Joined {{ user_detail.date_joined|date:'Y-m-d' }}</span>
+            </div>
+        </section>
+
+        <section class="content-card glass-card">
+            <h4 class="header">Account metadata</h4>
+            <table class="highlight responsive-table elevated-table">
+                <tbody>
+                    <tr>
+                        <th scope="row">Username</th>
+                        <td>{{ user_detail.username }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Full name</th>
+                        <td>{{ user_detail.get_full_name|default:'Not provided' }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Email</th>
+                        <td>{{ user_detail.email|default:'-' }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Primary group</th>
+                        <td>{{ user_detail.groups.first.name|default:'Unassigned' }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Last login</th>
+                        <td>
+                            {% if user_detail.last_login %}
+                                {{ user_detail.last_login|date:'Y-m-d H:i' }}
+                            {% else %}
+                                Not recorded
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="section-actions" style="margin-top:18px;">
+                <a href="{% url 'demo:user_list' %}" class="waves-effect waves-light btn-flat hero-secondary">
+                    <i class="material-icons left">arrow_back</i>Back to directory
+                </a>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}

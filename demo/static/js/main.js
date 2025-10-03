@@ -1,197 +1,336 @@
-// 全局JavaScript工具函数
+// Lightweight UI helpers for the dashboard
+(function () {
+    const ModalManager = {
+        modals: new Map(),
+        backdrop: null,
+        activeModal: null,
 
-// 初始化Materialize组件
-document.addEventListener('DOMContentLoaded', function() {
-    M.AutoInit();
-    
-    // 初始化所有模态框
-    var modals = document.querySelectorAll('.modal');
-    M.Modal.init(modals);
-    
-    // 初始化所有选择框
-    var selects = document.querySelectorAll('select');
-    M.FormSelect.init(selects);
-    
-    // 初始化所有工具提示
-    var tooltips = document.querySelectorAll('.tooltipped');
-    M.Tooltip.init(tooltips);
-});
+        init() {
+            this.backdrop = document.createElement('div');
+            this.backdrop.className = 'modal-backdrop';
+            this.backdrop.addEventListener('click', () => this.close());
+            document.body.appendChild(this.backdrop);
 
-window.hintTimer = null;
+            document.querySelectorAll('.modal').forEach(modal => {
+                const id = modal.getAttribute('id') || `modal-${this.modals.size + 1}`;
+                if (!modal.getAttribute('id')) {
+                    modal.setAttribute('id', id);
+                }
+                modal.setAttribute('aria-hidden', 'true');
+                modal.setAttribute('role', 'dialog');
+                modal.setAttribute('aria-modal', 'true');
+                modal.setAttribute('tabindex', '-1');
+                this.modals.set(id, modal);
 
-// 显示提示信息
-function showToast(message, classes = 'rounded') {
-    M.toast({html: message, classes: classes, displayLength: 3000});
-}
+                modal.querySelectorAll('[data-modal-close]').forEach(btn => {
+                    btn.addEventListener('click', evt => {
+                        evt.preventDefault();
+                        this.close();
+                    });
+                });
+            });
 
-// 显示操作提示
-function showHint(message) {
-    const hintEl = document.getElementById('actionHint');
-    const hintContent = document.getElementById('hintContent');
+            document.addEventListener('keydown', evt => {
+                if (evt.key === 'Escape' && this.activeModal) {
+                    this.close();
+                }
+            });
+        },
 
-    if (!hintEl || !hintContent) {
-        return;
-    }
+        open(id) {
+            const modal = this.modals.get(id);
+            if (!modal) {
+                console.warn(`Modal ${id} not found`);
+                return;
+            }
+            this.activeModal = modal;
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            this.backdrop.classList.add('is-visible');
+            document.body.classList.add('has-open-modal');
+            const focusTarget = modal.querySelector('[data-initial-focus]') || modal.querySelector('input, button, textarea, select');
+            if (focusTarget) {
+                focusTarget.focus({ preventScroll: true });
+            }
+        },
 
-    hintContent.textContent = message;
-    hintEl.classList.add('active');
-
-    if (window.hintTimer) {
-        clearTimeout(window.hintTimer);
-    }
-
-    window.hintTimer = setTimeout(() => {
-        closeHint();
-    }, 5000);
-}
-
-// 关闭操作提示
-function closeHint() {
-    const hintEl = document.getElementById('actionHint');
-    if (hintEl) {
-        hintEl.classList.remove('active');
-    }
-
-    if (window.hintTimer) {
-        clearTimeout(window.hintTimer);
-        window.hintTimer = null;
-    }
-}
-
-// 确认对话框
-function confirmAction(message, callback) {
-    if (confirm(message)) {
-        callback();
-    }
-}
-
-// 获取CSRF令牌
-function getCSRFToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]').value;
-}
-
-// 发送AJAX请求的通用函数
-async function sendRequest(url, options = {}) {
-    const defaultOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken()
+        close() {
+            if (!this.activeModal) {
+                return;
+            }
+            this.activeModal.classList.remove('is-open');
+            this.activeModal.setAttribute('aria-hidden', 'true');
+            this.activeModal = null;
+            this.backdrop.classList.remove('is-visible');
+            document.body.classList.remove('has-open-modal');
         }
     };
-    
-    const finalOptions = Object.assign(defaultOptions, options);
-    
-    try {
-        const response = await fetch(url, finalOptions);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('请求失败:', error);
-        showToast('请求失败，请稍后重试', 'rounded red');
-        throw error;
-    }
-}
 
-// 显示加载动画
-function showLoading(element) {
-    if (element) {
-        element.innerHTML = '<div class="loading-spinner"></div>处理中...';
-        element.disabled = true;
-    }
-}
-
-// 隐藏加载动画
-function hideLoading(element, originalText) {
-    if (element && originalText) {
-        element.innerHTML = originalText;
-        element.disabled = false;
-    }
-}
-
-// 表单验证
-function validateForm(formId) {
-    const form = document.getElementById(formId);
-    if (!form) return true;
-    
-    let isValid = true;
-    const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-    
-    inputs.forEach(input => {
-        if (!input.value.trim()) {
-            isValid = false;
-            input.classList.add('invalid');
-            showToast('请填写所有必填字段', 'rounded red');
-        } else {
-            input.classList.remove('invalid');
+    const ToastManager = {
+        container: null,
+        init() {
+            this.container = document.createElement('div');
+            this.container.className = 'toast-container';
+            document.body.appendChild(this.container);
+        },
+        show(message, variant = 'default') {
+            if (!this.container) {
+                this.init();
+            }
+            const toast = document.createElement('div');
+            toast.className = `toast-message toast-${variant}`;
+            toast.setAttribute('role', 'status');
+            toast.textContent = message;
+            this.container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('is-visible'));
+            setTimeout(() => {
+                toast.classList.remove('is-visible');
+                setTimeout(() => toast.remove(), 200);
+            }, 3200);
         }
-    });
-    
-    return isValid;
-}
-
-// 密码强度检查
-function checkPasswordStrength(password) {
-    const minLength = 8;
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumbers = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    
-    let strength = 0;
-    let feedback = [];
-    
-    if (password.length >= minLength) strength++;
-    else feedback.push('至少8个字符');
-    
-    if (hasUpperCase) strength++;
-    else feedback.push('包含大写字母');
-    
-    if (hasLowerCase) strength++;
-    else feedback.push('包含小写字母');
-    
-    if (hasNumbers) strength++;
-    else feedback.push('包含数字');
-    
-    if (hasSpecialChar) strength++;
-    else feedback.push('包含特殊字符');
-    
-    return {
-        strength: strength,
-        feedback: feedback,
-        isStrong: strength >= 4
     };
-}
 
-// 格式化日期
-function formatDate(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('zh-CN') + ' ' + date.toLocaleTimeString('zh-CN', {hour12: false});
-}
+    const TooltipManager = {
+        init() {
+            document.querySelectorAll('[data-tooltip]').forEach(trigger => {
+                trigger.addEventListener('mouseenter', () => this.show(trigger));
+                trigger.addEventListener('mouseleave', () => this.hide(trigger));
+                trigger.addEventListener('focus', () => this.show(trigger));
+                trigger.addEventListener('blur', () => this.hide(trigger));
+            });
+        },
+        show(trigger) {
+            const text = trigger.getAttribute('data-tooltip');
+            if (!text) {
+                return;
+            }
+            let tooltip = trigger._tooltipEl;
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.className = 'tooltip-bubble';
+                tooltip.textContent = text;
+                document.body.appendChild(tooltip);
+                trigger._tooltipEl = tooltip;
+            }
+            const rect = trigger.getBoundingClientRect();
+            tooltip.style.left = `${rect.left + rect.width / 2}px`;
+            tooltip.style.top = `${rect.top - 8}px`;
+            tooltip.classList.add('is-visible');
+        },
+        hide(trigger) {
+            if (trigger._tooltipEl) {
+                trigger._tooltipEl.classList.remove('is-visible');
+            }
+        }
+    };
 
-// 防抖函数
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
+    function showHint(message) {
+        const hintEl = document.getElementById('actionHint');
+        const hintContent = document.getElementById('hintContent');
+        if (!hintEl || !hintContent) {
+            return;
+        }
+        hintContent.textContent = message;
+        hintEl.classList.add('active');
+        if (window.hintTimer) {
+            clearTimeout(window.hintTimer);
+        }
+        window.hintTimer = setTimeout(() => closeHint(), 5000);
+    }
+
+    function closeHint() {
+        const hintEl = document.getElementById('actionHint');
+        if (hintEl) {
+            hintEl.classList.remove('active');
+        }
+        if (window.hintTimer) {
+            clearTimeout(window.hintTimer);
+            window.hintTimer = null;
+        }
+    }
+
+    function showToast(message, variant = 'default') {
+        ToastManager.show(message, variant);
+    }
+
+    function confirmAction(message, callback) {
+        if (typeof callback !== 'function') {
+            return;
+        }
+        if (window.confirm(message)) {
+            callback();
+        }
+    }
+
+    function getCSRFToken() {
+        const tokenField = document.querySelector('input[name="csrfmiddlewaretoken"]');
+        return tokenField ? tokenField.value : '';
+    }
+
+    async function sendRequest(url, options = {}) {
+        const defaultOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
         };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// 节流函数
-function throttle(func, limit) {
-    let inThrottle;
-    return function() {
-        const args = arguments;
-        const context = this;
-        if (!inThrottle) {
-            func.apply(context, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
+        const finalOptions = Object.assign({}, defaultOptions, options);
+        if (options.headers) {
+            finalOptions.headers = Object.assign({}, defaultOptions.headers, options.headers);
+        }
+        try {
+            const response = await fetch(url, finalOptions);
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`);
+            }
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                return await response.json();
+            }
+            return await response.text();
+        } catch (error) {
+            console.error('Request error:', error);
+            showToast('Request failed. Please try again shortly.', 'error');
+            throw error;
         }
     }
-}
+
+    function showLoading(element, label = 'Working...') {
+        if (!element) {
+            return;
+        }
+        if (!element.dataset.originalContent) {
+            element.dataset.originalContent = element.innerHTML;
+        }
+        element.innerHTML = `<span class="loading-spinner"></span>${label}`;
+        element.classList.add('is-loading');
+        element.setAttribute('aria-disabled', 'true');
+        element.style.pointerEvents = 'none';
+        if ('disabled' in element) {
+            element.disabled = true;
+        }
+    }
+
+    function hideLoading(element, fallbackLabel) {
+        if (!element) {
+            return;
+        }
+        const original = element.dataset.originalContent || fallbackLabel;
+        if (original) {
+            element.innerHTML = original;
+        }
+        element.classList.remove('is-loading');
+        element.removeAttribute('aria-disabled');
+        element.style.pointerEvents = '';
+        if ('disabled' in element) {
+            element.disabled = false;
+        }
+    }
+
+    function validateForm(formId) {
+        const form = document.getElementById(formId);
+        if (!form) {
+            return true;
+        }
+        let isValid = true;
+        form.querySelectorAll('input[required], select[required], textarea[required]').forEach(field => {
+            if (!field.value || !field.value.toString().trim()) {
+                field.classList.add('invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('invalid');
+            }
+        });
+        if (!isValid) {
+            showToast('Please complete all required fields.', 'error');
+        }
+        return isValid;
+    }
+
+    function checkPasswordStrength(password) {
+        const requirements = [
+            { rule: /.{8,}/, message: 'Use at least 8 characters.' },
+            { rule: /[A-Z]/, message: 'Add an uppercase letter.' },
+            { rule: /[a-z]/, message: 'Add a lowercase letter.' },
+            { rule: /\d/, message: 'Add a number.' },
+            { rule: /[!@#$%^&*(),.?":{}|<>]/, message: 'Add a symbol.' }
+        ];
+        const feedback = [];
+        let strength = 0;
+        requirements.forEach(requirement => {
+            if (requirement.rule.test(password)) {
+                strength += 1;
+            } else {
+                feedback.push(requirement.message);
+            }
+        });
+        return {
+            strength,
+            feedback,
+            isStrong: strength >= 4
+        };
+    }
+
+    function formatDate(value) {
+        if (!value) {
+            return '-';
+        }
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+            return '-';
+        }
+        return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour12: false })}`;
+    }
+
+    function debounce(fn, wait) {
+        let timeout;
+        return function debounced(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => fn.apply(this, args), wait);
+        };
+    }
+
+    function throttle(fn, limit) {
+        let inThrottle = false;
+        return function throttled(...args) {
+            if (inThrottle) {
+                return;
+            }
+            fn.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => {
+                inThrottle = false;
+            }, limit);
+        };
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        window.hintTimer = null;
+        ModalManager.init();
+        ToastManager.init();
+        TooltipManager.init();
+    });
+
+    window.UIKit = {
+        ModalManager,
+        ToastManager,
+        TooltipManager
+    };
+
+    window.showToast = showToast;
+    window.showHint = showHint;
+    window.closeHint = closeHint;
+    window.confirmAction = confirmAction;
+    window.getCSRFToken = getCSRFToken;
+    window.sendRequest = sendRequest;
+    window.showLoading = showLoading;
+    window.hideLoading = hideLoading;
+    window.validateForm = validateForm;
+    window.checkPasswordStrength = checkPasswordStrength;
+    window.formatDate = formatDate;
+    window.debounce = debounce;
+    window.throttle = throttle;
+})();

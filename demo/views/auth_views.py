@@ -6,6 +6,9 @@ from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
+from django.db.models import Count
+from django.core.serializers.json import DjangoJSONEncoder
+import json
 import re
 
 # 导入日志模块
@@ -104,25 +107,44 @@ def check_username(request):
 
 
 @login_required(login_url='demo:login')
+
 def home(request):
-    log_operation(f"用户 {request.user.username} 访问首页", request)
+    log_operation(f"User {request.user.username} opened dashboard", request)
     user_groups = list(request.user.groups.values_list('name', flat=True))
-    log_operation(f"用户 {request.user.username} 所属用户组: {user_groups}", request)
+    log_operation(f"User {request.user.username} groups: {user_groups}", request)
 
-    # 统计信息
-    user_count = User.objects.count()
-    group_count = Group.objects.count()
-    active_user_count = User.objects.filter(is_active=True).count()
+    users_qs = User.objects.prefetch_related('groups').order_by('username')
+    groups_qs = Group.objects.annotate(member_count=Count('user', distinct=True)).order_by('name')
 
-    log_operation(f"系统统计 - 用户总数: {user_count}, 激活用户: {active_user_count}, 用户组: {group_count}", request)
+    user_count = users_qs.count()
+    group_count = groups_qs.count()
+    active_user_count = users_qs.filter(is_active=True).count()
+
+    log_operation(
+        f"Stats - users: {user_count}, active users: {active_user_count}, groups: {group_count}",
+        request
+    )
+
+    dashboard_state = {
+        'currentUserId': request.user.id,
+        'currentUserName': request.user.get_full_name() or request.user.username,
+        'currentUserGroup': user_groups[0] if user_groups else '',
+        'canChangeUser': request.user.has_perm('auth.change_user'),
+        'canDeleteUser': request.user.has_perm('auth.delete_user'),
+        'canChangeGroup': request.user.has_perm('auth.change_group'),
+    }
+    dashboard_state_json = json.dumps(dashboard_state, cls=DjangoJSONEncoder)
 
     context = {
         'title': '用户管理',
         'current_time': timezone.now(),
-        'users': User.objects.all(),
-        'groups': Group.objects.all(),
+        'users': users_qs,
+        'groups': groups_qs,
         'user_count': user_count,
         'active_user_count': active_user_count,
-        'group_count': group_count
+        'group_count': group_count,
+        'dashboard_state': dashboard_state,
+        'dashboard_state_json': dashboard_state_json,
     }
     return render(request, 'demo/home.html', context)
+

@@ -30,18 +30,37 @@ def user_list(request):
 @permission_required('auth.view_user', login_url='demo:login')
 def user_detail(request, user_id):
     user = get_object_or_404(User, pk=user_id)
-    log_operation(f"管理员 {request.user.username} 查看用户详情: {user.username}", request)
-    log_operation(f"用户 {user.username} 信息 - 邮箱: {user.email}, 状态: {'激活' if user.is_active else '未激活'}", request)
+    log_operation(f"Admin {request.user.username} viewed user detail: {user.username}", request)
+    log_operation(f"User {user.username} snapshot - email: {user.email or 'N/A'}, status: {'ACTIVE' if user.is_active else 'INACTIVE'}", request)
+
+    primary_group = user.groups.first()
+    payload = {
+        'status': 'success',
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'full_name': user.get_full_name(),
+        'group_id': primary_group.id if primary_group else None,
+        'group_name': primary_group.name if primary_group else None,
+        'is_active': user.is_active,
+        'date_joined': user.date_joined.isoformat(),
+        'last_login': user.last_login.isoformat() if user.last_login else None
+    }
+
+    accept_header = request.headers.get('Accept', '')
+    wants_json = request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in accept_header or request.GET.get('format') == 'json'
+
+    if wants_json:
+        return JsonResponse(payload)
+
     context = {
         'user_detail': user,
         'groups': Group.objects.all(),
         'title': '用户详情'
     }
     return render(request, 'demo/user_detail.html', context)
-
-
-@login_required(login_url='demo:login')
-@permission_required('auth.view_user', login_url='demo:login')
 def users_api(request):
     log_operation(f"管理员 {request.user.username} 请求用户数据API", request)
     users = User.objects.all()
