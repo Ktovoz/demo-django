@@ -9,6 +9,11 @@
 
 {% block content %}
 <div class="layout-shell">
+    <div class="ambient-background" aria-hidden="true">
+        <span class="shape shape-1"></span>
+        <span class="shape shape-2"></span>
+        <span class="shape shape-3"></span>
+    </div>
     <button class="mobile-menu-btn hide-on-large-only" id="menuToggle" type="button" aria-label="Open navigation">
         <i class="material-icons">menu</i>
     </button>
@@ -103,6 +108,7 @@
     </nav>
 
     <main class="main-content" role="main">
+        <div class="main-stack">
         <section class="welcome-panel glass-card">
             <div class="welcome-primary">
                 <span class="panel-badge">
@@ -346,6 +352,7 @@
                 </tbody>
             </table>
         </section>
+        </div>
     </main>
 </div>
 
