@@ -58,7 +58,7 @@ isort .
 ```
 demo-django-hub/
 ├── DjangoProject/           # Project configuration
-│   ├── settings.py         # Main settings (Django 5.2+)
+│   ├── settings.py         # Main settings (Django 5.2)
 │   ├── urls.py            # Root URL configuration
 │   └── wsgi.py           # WSGI configuration
 ├── demo/                  # Main application
@@ -71,6 +71,8 @@ demo-django-hub/
 │   │   ├── user_api.py       # User API endpoints
 │   │   ├── group_api.py      # Group API endpoints
 │   │   └── serializers.py    # API serializers
+│   ├── static/           # Static files
+│   ├── templates/         # HTML templates
 │   ├── views.py          # Backward compatibility layer
 │   ├── logger.py         # Loguru-based logging system
 │   └── urls.py           # App URL routing
@@ -78,7 +80,7 @@ demo-django-hub/
 │   └── db.sqlite3        # SQLite database file
 ├── logs/                 # Log files directory
 ├── staticfiles/          # Collected static files
-└── templates/            # HTML templates
+└── templates/            # HTML templates (root level)
 ```
 
 ### Key Architectural Patterns
@@ -131,9 +133,9 @@ demo-django-hub/
 - Default admin credentials: admin/admin
 
 ### Logging Best Practices
-- Use `log_operation()` for general operations
-- Use `log_security()` for security-related events
-- Use `log_audit()` for important system changes
+- Use logger.info(), logger.warning(), logger.error() for different log levels
+- Log files: django.log (general), security.log (security events), error.log (errors)
+- Automatic rotation at 500MB, retention for 30 days
 - All functions support client context from request objects
 
 ## Important Configuration Details

@@ -13,6 +13,7 @@ urlpatterns = [
     path('', auth_views.home, name='home'),
     path('login/', auth_views.login_view, name='login'),
     path('register/', auth_views.register_view, name='register'),
+    path('check-username/', auth_views.check_username, name='check_username'),
     path('logout/', LogoutView.as_view(next_page='demo:login', template_name='demo/login.html'), name='logout'),
     
     # API endpoints

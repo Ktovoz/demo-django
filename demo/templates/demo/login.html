@@ -4,170 +4,125 @@
 {% block title %}用户登录{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/login.css' %}">
+<link rel="stylesheet" href="{% static 'css/login.css' %}"/>
 {% endblock %}
 
 {% block content %}
-<body class="auth-body login-page">
-    <div class="login-container">
-        <form method="post" action="{% url 'demo:login' %}" class="login-card" id="loginForm">
-            {% csrf_token %}
-            
-            <div class="login-title">
-                <h2>欢迎回来</h2>
-                <div class="subtitle">登录您的Django Hub账户</div>
+<section class="auth-wrapper auth-wrapper--login">
+    <div class="auth-grid">
+        <div class="auth-card" id="loginFormContainer">
+        <div class="auth-card__header">
+            <h2>欢迎回来</h2>
+            <p>登录您的 Django Hub 账户</p>
+        </div>
+
+        <div class="auth-card__highlight" aria-live="polite">
+            <div class="auth-card__highlight-title">
+                <i class="material-icons">lock</i>
+                <span>演示账户</span>
             </div>
-            
-            <!-- 演示账户信息区域 -->
-            <div class="demo-account-info">
-                <div class="info-title">
-                    <i class="material-icons">lock</i>
-                    <span>演示账户信息</span>
+            <dl class="auth-card__highlight-meta">
+                <div>
+                    <dt>用户名</dt>
+                    <dd>admin</dd>
                 </div>
-                <div class="info-content">
-                    <div class="info-item">
-                        <span class="info-label">用户名:</span>
-                        <span class="info-value">admin</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">密码:</span>
-                        <span class="info-value">admin</span>
-                    </div>
+                <div>
+                    <dt>密码</dt>
+                    <dd>admin</dd>
                 </div>
-            </div>
-            
-            {% if messages %}
-            <div class="login-error">
-                <i class="material-icons error-icon">error</i>
+            </dl>
+            <button type="button" class="auth-helper__button" id="fillDemoBtn">一键填充演示账户</button>
+        </div>
+
+        {% if messages %}
+        <div class="auth-alert auth-alert--error" role="alert">
+            <i class="material-icons" aria-hidden="true">error_outline</i>
+            <div>
                 {% for message in messages %}
-                    {{ message }}
+                    <p>{{ message }}</p>
                 {% endfor %}
             </div>
-            {% endif %}
-            
-            <div class="login-field">
-                <input type="text" id="username" name="username" placeholder=" " required>
+        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'demo:login' %}" id="loginForm" class="auth-form">
+            {% csrf_token %}
+
+            <div class="form-field">
+                <input type="text" id="username" name="username" placeholder=" " required autocomplete="username">
                 <label for="username">用户名</label>
-                <span class="helper-text" style="font-size: 0.85rem; color: #666; margin-top: 5px; display: block;">请输入您的用户名</span>
+                <small class="form-tip">请输入登录账号</small>
             </div>
-            
-            <div class="login-field">
-                <input type="password" id="password" name="password" placeholder=" " required>
+
+            <div class="form-field">
+                <input type="password" id="password" name="password" placeholder=" " required autocomplete="current-password">
                 <label for="password">密码</label>
-                <span class="helper-text" style="font-size: 0.85rem; color: #666; margin-top: 5px; display: block;">请输入您的密码</span>
+                <small class="form-tip">密码区分大小写</small>
             </div>
-            
-            <div class="remember-me" onclick="toggleRememberMe()">
-                <input type="checkbox" id="rememberMe" name="remember_me">
-                <span class="checkmark"></span>
-                记住我
+
+            <div class="form-extras">
+                <label class="form-checkbox">
+                    <input type="checkbox" id="rememberMe" name="remember_me">
+                    <span class="form-checkbox__decor" aria-hidden="true">
+                        <i class="material-icons">check</i>
+                    </span>
+                    <span class="form-checkbox__label">记住我</span>
+                </label>
+                <a class="form-link" href="mailto:admin@example.com">忘记密码？</a>
             </div>
-            
-            <button class="login-btn" type="submit" id="loginBtn">
-                <i class="material-icons btn-icon">login</i>
-                立即登录
+
+            <button class="form-button" type="submit" id="loginSubmit">
+                <span class="form-button__label">立即登录</span>
+                <i class="material-icons" aria-hidden="true">arrow_forward</i>
             </button>
-            
-            <div class="register-link-section">
-                <p>还没有账号？ <a href="{% url 'demo:register' %}" class="register-link">立即注册</a></p>
-            </div>
         </form>
+
+        <div class="auth-footer">
+            <span>还没有账号？</span>
+            <a href="{% url 'demo:register' %}">立即注册</a>
+        </div>
+        </div>
+
+        <div class="auth-hero">
+            <div class="auth-hero__card">
+                <div class="auth-hero__badge">Django Hub</div>
+                <h1 class="auth-hero__title">集中化的团队权限管控中枢</h1>
+                <p class="auth-hero__subtitle">随时掌握用户、用户组与关键操作动态，让协作始终安全高效。</p>
+                <ul class="auth-hero__list">
+                    <li><i class="material-icons">dashboard</i><span>统一的控制面板可视化用户状态</span></li>
+                    <li><i class="material-icons">bolt</i><span>实时刷新与批量操作助力日常运维</span></li>
+                    <li><i class="material-icons">security</i><span>精细化权限边界保障敏感数据安全</span></li>
+                </ul>
+            </div>
+        </div>
     </div>
-    
-    <script>
-        // 表单提交动画
-        const loginBtn = document.getElementById('loginBtn');
-        const loginForm = document.getElementById('loginForm');
-        
-        loginForm.addEventListener('submit', function(e) {
-            loginBtn.classList.add('loading');
-            loginBtn.innerHTML = '<div class="loading-spinner"></div>登录中...';
+</section>
+
+<script>
+(function () {
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('loginSubmit');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const demoBtn = document.getElementById('fillDemoBtn');
+
+    if (form && submitBtn) {
+        form.addEventListener('submit', function () {
+            submitBtn.classList.add('is-loading');
+            submitBtn.setAttribute('aria-busy', 'true');
+            submitBtn.querySelector('.form-button__label').textContent = '登录中…';
         });
-        
-        // 自动填充演示账户
-        document.addEventListener('DOMContentLoaded', function() {
-            const demoLink = document.createElement('div');
-            demoLink.innerHTML = `
-                <div style="text-align: center; margin-top: 1rem;">
-                    <button type="button" onclick="fillDemoAccount()" style="
-                        background: rgba(67, 233, 123, 0.1); 
-                        color: #43e97b; 
-                        border: 1px solid #43e97b; 
-                        padding: 0.5rem 1rem; 
-                        border-radius: 8px; 
-                        cursor: pointer; 
-                        font-size: 0.9rem;
-                        transition: all 0.3s ease;
-                    ">试用演示账户</button>
-                </div>
-            `;
-            loginForm.appendChild(demoLink);
+    }
+
+    if (demoBtn && usernameInput && passwordInput) {
+        demoBtn.addEventListener('click', function () {
+            usernameInput.value = 'admin';
+            passwordInput.value = 'admin';
+            usernameInput.dispatchEvent(new Event('input'));
+            passwordInput.dispatchEvent(new Event('input'));
+            usernameInput.focus();
         });
-        
-        function fillDemoAccount() {
-            document.getElementById('username').value = 'admin';
-            document.getElementById('password').value = 'admin';
-            
-            // 触发输入事件以更新样式
-            document.getElementById('username').dispatchEvent(new Event('input'));
-            document.getElementById('password').dispatchEvent(new Event('input'));
-        }
-        
-        // 表单验证反馈
-        const inputs = document.querySelectorAll('.login-field input');
-        inputs.forEach(input => {
-            input.addEventListener('input', function() {
-                if (this.value.length > 0) {
-                    this.classList.add('valid');
-                    this.classList.remove('invalid');
-                } else {
-                    this.classList.remove('valid');
-                }
-            });
-        });
-        
-        // 记住我复选框功能
-        function toggleRememberMe() {
-            const checkbox = document.getElementById('rememberMe');
-            checkbox.checked = !checkbox.checked;
-            
-            // 更新视觉状态
-            const checkmark = checkbox.nextElementSibling;
-            if (checkbox.checked) {
-                checkmark.style.background = '#667eea';
-                checkmark.style.borderColor = '#667eea';
-            } else {
-                checkmark.style.background = '';
-                checkmark.style.borderColor = '#ddd';
-            }
-        }
-        
-        // 初始化复选框状态
-        document.addEventListener('DOMContentLoaded', function() {
-            const checkbox = document.getElementById('rememberMe');
-            const checkmark = checkbox.nextElementSibling;
-            
-            // 设置初始状态
-            if (checkbox.checked) {
-                checkmark.style.background = '#667eea';
-                checkmark.style.borderColor = '#667eea';
-            }
-            
-            // 添加键盘支持
-            checkbox.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleRememberMe();
-                }
-            });
-        });
-        
-        // 快捷键支持
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'Enter') {
-                loginForm.submit();
-            }
-        });
-    </script>
-</body>
+    }
+})();
+</script>
 {% endblock %}

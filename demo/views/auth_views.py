@@ -5,6 +5,8 @@ from django.utils import timezone
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
+from django.http import JsonResponse
+import re
 
 # 导入日志模块
 from ..logger import logger, log_security, log_operation
@@ -74,6 +76,31 @@ def register_view(request):
 
     log_operation("显示注册页面", request)
     return render(request, 'demo/register.html', {'title': '用户注册'})
+
+
+def check_username(request):
+    """检查用户名是否可用"""
+    username = request.GET.get('username', '').strip()
+
+    if not username:
+        return JsonResponse({'valid': False, 'message': '用户名不能为空'})
+
+    # 检查用户名长度
+    if len(username) < 3:
+        return JsonResponse({'valid': False, 'message': '用户名至少需要3个字符'})
+
+    if len(username) > 20:
+        return JsonResponse({'valid': False, 'message': '用户名不能超过20个字符'})
+
+    # 检查用户名格式
+    if not re.match(r'^[a-zA-Z0-9_]+$', username):
+        return JsonResponse({'valid': False, 'message': '用户名只能包含字母、数字和下划线'})
+
+    # 检查用户名是否已存在
+    if User.objects.filter(username=username).exists():
+        return JsonResponse({'valid': False, 'message': '该用户名已被注册'})
+
+    return JsonResponse({'valid': True, 'message': '用户名可用'})
 
 
 @login_required(login_url='demo:login')
