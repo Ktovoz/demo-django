@@ -214,30 +214,40 @@ def change_user_group(request, user_id):
         if not current_user.groups.filter(name='超级管理员').exists():
             user_group = Group.objects.get(name='普通用户')
             if not user.groups.filter(id=user_group.id).exists():
+                logger.warning(f"用户组更新失败: {current_user.username} 尝试管理非普通用户 {user.username}")
                 return JsonResponse({
                     'status': 'error',
                     'message': '您只能管理普通用户'
                 }, status=403)
-        
+
         # 防止用户修改自己的用户组
         if user.id == current_user.id:
+            logger.warning(f"用户组更新失败: {user.username} 尝试修改自己的用户组")
             return JsonResponse({
                 'status': 'error',
                 'message': '不能修改自己的用户组'
             }, status=400)
-        
+
+        # 记录原用户组
+        old_groups = list(user.groups.values_list('name', flat=True))
+
         # 更新用户组
         user.groups.clear()
         group_id = data.get('group_id')
         if group_id:
             group = Group.objects.get(pk=group_id)
             user.groups.add(group)
-        
+            new_group_name = group.name
+        else:
+            new_group_name = "无组"
+
+        logger.info(f"用户组更新成功: {user.username} {old_groups} -> {new_group_name}")
         return JsonResponse({
             'status': 'success',
             'message': '用户组更新成功'
         })
     except Exception as e:
+        logger.error(f"用户组更新失败: {user.username if 'user' in locals() else 'unknown'} - {str(e)}")
         return JsonResponse({
             'status': 'error',
             'message': str(e)
@@ -323,12 +333,17 @@ def available_users_for_group(request, group_id):
 
     # 获取不在此用户组中的用户
     available_users = User.objects.exclude(groups=group)
+    logger.debug(f"查询可分配到用户组 '{group.name}' 的用户")
 
     # 权限限制：非超级管理员只能看到普通用户
     if not current_user.groups.filter(name='超级管理员').exists():
         user_group = Group.objects.get(name='普通用户')
         available_users = available_users.filter(groups=user_group)
-    
+        logger.debug(f"管理员 {current_user.username} 只能管理普通用户")
+
+    user_count = available_users.count()
+    logger.info(f"用户组 '{group.name}' 可分配用户数量: {user_count}")
+
     return JsonResponse({
         'users': [
             {

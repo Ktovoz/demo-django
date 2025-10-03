@@ -69,10 +69,24 @@ def register_view(request):
 
 @login_required(login_url='demo:login')
 def home(request):
+    logger.info(f"用户 {request.user.username} 访问首页")
+    user_groups = list(request.user.groups.values_list('name', flat=True))
+    logger.debug(f"用户 {request.user.username} 所属用户组: {user_groups}")
+
+    # 统计信息
+    user_count = User.objects.count()
+    group_count = Group.objects.count()
+    active_user_count = User.objects.filter(is_active=True).count()
+
+    logger.debug(f"系统统计 - 用户总数: {user_count}, 激活用户: {active_user_count}, 用户组: {group_count}")
+
     context = {
         'title': '用户管理',
         'current_time': timezone.now(),
         'users': User.objects.all(),
-        'groups': Group.objects.all()
+        'groups': Group.objects.all(),
+        'user_count': user_count,
+        'active_user_count': active_user_count,
+        'group_count': group_count
     }
     return render(request, 'demo/home.html', context)

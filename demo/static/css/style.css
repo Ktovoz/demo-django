@@ -48,7 +48,6 @@ body {
     height: 100vh;
     margin: 0;
     padding: 20px;
-    animation: bgFlow 20s linear infinite;
 }
 
 .auth-body::before {
@@ -71,6 +70,16 @@ body {
     background: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.08) 50%);
     animation: bgFlow 30s linear infinite;
     z-index: -2;
+}
+
+/* 背景流动动画 - 修复旋转bug */
+@keyframes bgFlow {
+    0% { 
+        transform: rotate(0deg) translate(-25%, -25%); 
+    }
+    100% { 
+        transform: rotate(360deg) translate(-25%, -25%); 
+    }
 }
 
 .auth-card {
@@ -217,17 +226,6 @@ body {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
     75% { transform: translateX(5px); }
-}
-
-@keyframes bgFlow {
-    0% { transform: rotate(0deg) translate(-25%, -25%); }
-    100% { transform: rotate(360deg) translate(-25%, -25%); }
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
 }
 
 /* 响应式设计 */
