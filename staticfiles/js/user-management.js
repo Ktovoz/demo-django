@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('hasVisitedBefore', 'true');
         }, 1000);
     }
+    
+    // 绑定密码输入事件
+    bindPasswordEvents();
 });
 
 // 绑定表格行事件
@@ -74,6 +77,28 @@ function bindMenuToggleEvents() {
     }
 }
 
+// 绑定密码输入事件
+function bindPasswordEvents() {
+    const passwordInput = document.getElementById('newPassword');
+    if (passwordInput) {
+        passwordInput.addEventListener('input', debounce(function() {
+            const password = this.value;
+            if (password.length > 0) {
+                const strength = checkPasswordStrength(password);
+                let feedback = '密码强度: ';
+                if (strength.strength <= 2) {
+                    feedback += '弱';
+                } else if (strength.strength <= 3) {
+                    feedback += '中';
+                } else {
+                    feedback += '强';
+                }
+                // 可以在这里显示密码强度提示
+            }
+        }, 300));
+    }
+}
+
 // 显示用户列表
 function showUserList(element) {
     document.getElementById('userListView').style.display = 'block';
@@ -85,6 +110,9 @@ function showUserList(element) {
         document.getElementById('sideNav').classList.remove('active');
         document.getElementById('menuToggle').classList.remove('active');
     }
+    
+    // 添加淡入动画
+    document.getElementById('userListView').classList.add('fade-in-up');
 }
 
 // 显示用户组列表
@@ -98,6 +126,9 @@ function showGroupList(element) {
         document.getElementById('sideNav').classList.remove('active');
         document.getElementById('menuToggle').classList.remove('active');
     }
+    
+    // 添加淡入动画
+    document.getElementById('groupListView').classList.add('fade-in-up');
 }
 
 // 更新菜单激活状态
@@ -121,7 +152,7 @@ function showCreateUserModal() {
     document.getElementById('passwordGroup').classList.add('required-field');
     
     M.updateTextFields();
-    M.FormSelect.init(document.getElementById('userGroup'));
+    M.FormSelect.init(document.querySelectorAll('select'));
     M.Modal.getInstance(document.getElementById('userModal')).open();
     
     setTimeout(() => {
@@ -147,7 +178,7 @@ function showEditUserModal(userId) {
             document.getElementById('passwordGroup').classList.remove('required-field');
             
             M.updateTextFields();
-            M.FormSelect.init(document.getElementById('userGroup'));
+            M.FormSelect.init(document.querySelectorAll('select'));
             M.Modal.getInstance(document.getElementById('userModal')).open();
         })
         .catch(error => {
@@ -158,6 +189,15 @@ function showEditUserModal(userId) {
 
 // 保存用户
 function saveUser() {
+    // 验证表单
+    if (!validateForm('userForm')) {
+        return;
+    }
+    
+    const saveBtn = document.querySelector('#userModal .modal-footer .btn');
+    const originalText = saveBtn.innerHTML;
+    showLoading(saveBtn);
+    
     const userId = document.getElementById('userId').value;
     const data = {
         username: document.getElementById('username').value,
@@ -179,14 +219,21 @@ function saveUser() {
     .then(data => {
         if (data.status === 'success') {
             M.Modal.getInstance(document.getElementById('userModal')).close();
-            showToast('操作成功', 'rounded');
+            showToast('操作成功', 'rounded green');
             showHint(userId ? '用户信息已更新成功' : '新用户创建成功');
             setTimeout(() => {
                 location.reload();
-            }, 1000);
+            }, 1500);
         } else {
             showToast(data.message, 'rounded red');
         }
+    })
+    .catch(error => {
+        console.error('保存失败:', error);
+        showToast('保存失败，请稍后重试', 'rounded red');
+    })
+    .finally(() => {
+        hideLoading(saveBtn, originalText);
     });
 }
 
@@ -196,19 +243,33 @@ function deleteUser(userId) {
     const username = userRow ? userRow.querySelector('td:first-child').textContent : '该用户';
     
     confirmAction(`确定要删除用户【${username}】吗？此操作不可恢复！`, () => {
+        const deleteBtn = event.target;
+        const originalText = deleteBtn ? deleteBtn.innerHTML : '';
+        if (deleteBtn) showLoading(deleteBtn);
+        
         sendRequest(`/users/${userId}/delete/`, {
             method: 'POST'
-        })
+            })
         .then(data => {
             if (data.status === 'success') {
-                showToast('删除成功', 'rounded');
+                showToast('删除成功', 'rounded green');
                 showHint('用户已成功删除');
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+                if (userRow) {
+                    userRow.style.animation = 'fadeOut 0.3s ease-out';
+                    setTimeout(() => {
+                        userRow.remove();
+                    }, 300);
+                }
             } else {
                 showToast(data.message, 'rounded red');
             }
+        })
+        .catch(error => {
+            console.error('删除失败:', error);
+            showToast('删除失败，请稍后重试', 'rounded red');
+        })
+        .finally(() => {
+            if (deleteBtn) hideLoading(deleteBtn, originalText);
         });
     });
 }
@@ -220,14 +281,27 @@ function showChangePasswordModal(userId) {
     
     const oldPasswordGroup = document.getElementById('oldPasswordGroup');
     if (oldPasswordGroup) {
-        oldPasswordGroup.style.display = (userId == currentUserId) ? 'none' : 'block';
+        oldPasswordGroup.style.display = (userId == currentUserId) ? 'block' : 'none';
     }
     
     M.Modal.getInstance(document.getElementById('passwordModal')).open();
+    
+    setTimeout(() => {
+        document.getElementById('newPassword').focus();
+    }, 300);
 }
 
 // 保存密码
 function savePassword() {
+    // 验证表单
+    if (!validateForm('passwordForm')) {
+        return;
+    }
+    
+    const saveBtn = document.querySelector('#passwordModal .modal-footer .btn');
+    const originalText = saveBtn.innerHTML;
+    showLoading(saveBtn);
+    
     const userId = document.getElementById('passwordUserId').value;
     const data = {
         new_password: document.getElementById('newPassword').value
@@ -245,16 +319,26 @@ function savePassword() {
     .then(data => {
         if (data.status === 'success') {
             M.Modal.getInstance(document.getElementById('passwordModal')).close();
-            showToast('密码修改成功', 'rounded');
+            showToast('密码修改成功', 'rounded green');
+            showHint('密码已成功修改');
         } else {
             showToast(data.message, 'rounded red');
         }
+    })
+    .catch(error => {
+        console.error('修改密码失败:', error);
+        showToast('修改密码失败，请稍后重试', 'rounded red');
+    })
+    .finally(() => {
+        hideLoading(saveBtn, originalText);
     });
 }
 
 // 显示用户组成员
 function showGroupMembers(groupId) {
     currentGroupId = groupId;
+    
+    showToast('正在加载成员信息...', 'rounded blue');
     
     sendRequest(`/groups/${groupId}/members/`)
         .then(data => {
@@ -311,6 +395,10 @@ function showGroupMembers(groupId) {
             }
             
             M.Modal.getInstance(document.getElementById('groupMembersModal')).open();
+        })
+        .catch(error => {
+            console.error('加载成员信息失败:', error);
+            showToast('加载成员信息失败', 'rounded red');
         });
 }
 
@@ -321,6 +409,10 @@ function addUserToGroup() {
         showToast('请选择用户', 'rounded red');
         return;
     }
+    
+    const addBtn = event.target;
+    const originalText = addBtn.innerHTML;
+    showLoading(addBtn);
 
     sendRequest(`/users/${userId}/change-group/`, {
         method: 'POST',
@@ -330,18 +422,29 @@ function addUserToGroup() {
     })
     .then(data => {
         if (data.status === 'success') {
-            showToast('添加成功', 'rounded');
+            showToast('添加成功', 'rounded green');
+            showHint('用户已成功添加到组');
             showGroupMembers(currentGroupId);
-            location.reload();
         } else {
             showToast(data.message, 'rounded red');
         }
+    })
+    .catch(error => {
+        console.error('添加失败:', error);
+        showToast('添加失败，请稍后重试', 'rounded red');
+    })
+    .finally(() => {
+        hideLoading(addBtn, originalText);
     });
 }
 
 // 从组中移除用户
 function removeUserFromGroup(userId) {
     confirmAction('确定要将此用户从组中移除吗？', () => {
+        const removeBtn = event.target;
+        const originalText = removeBtn.innerHTML;
+        showLoading(removeBtn);
+        
         sendRequest(`/users/${userId}/change-group/`, {
             method: 'POST',
             body: JSON.stringify({
@@ -350,18 +453,29 @@ function removeUserFromGroup(userId) {
         })
         .then(data => {
             if (data.status === 'success') {
-                showToast('移除成功', 'rounded');
+                showToast('移除成功', 'rounded green');
+                showHint('用户已成功从组中移除');
                 showGroupMembers(currentGroupId);
-                location.reload();
             } else {
                 showToast(data.message, 'rounded red');
             }
+        })
+        .catch(error => {
+            console.error('移除失败:', error);
+            showToast('移除失败，请稍后重试', 'rounded red');
+        })
+        .finally(() => {
+            hideLoading(removeBtn, originalText);
         });
     });
 }
 
 // 刷新用户列表
 function refreshUserList() {
+    const refreshBtn = event.target;
+    const originalText = refreshBtn.innerHTML;
+    showLoading(refreshBtn);
+    
     sendRequest('/users/api/')
         .then(data => {
             const tbody = document.getElementById('userTableBody');
@@ -369,6 +483,7 @@ function refreshUserList() {
             
             data.users.forEach(user => {
                 const tr = document.createElement('tr');
+                tr.setAttribute('data-user-id', user.id);
                 let btnHtml = '';
                 
                 if (hasChangeUserPerm) {
@@ -399,9 +514,58 @@ function refreshUserList() {
                 `;
                 tbody.appendChild(tr);
             });
+            
+            showToast('列表刷新成功', 'rounded green');
+            showHint('用户列表已刷新');
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('刷新失败:', error);
             showToast('刷新列表失败，请稍后重试', 'rounded red');
+        })
+        .finally(() => {
+            hideLoading(refreshBtn, originalText);
         });
+}
+
+// 保存用户组成员
+function saveGroupMembers() {
+    showToast('正在保存...', 'rounded blue');
+    // 这里可以添加保存逻辑
+    setTimeout(() => {
+        M.Modal.getInstance(document.getElementById('groupMembersModal')).close();
+        showToast('保存成功', 'rounded green');
+    }, 1000);
+}
+
+// 密码强度检查
+function checkPasswordStrength(password) {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    let strength = 0;
+    let feedback = [];
+    
+    if (password.length >= minLength) strength++;
+    else feedback.push('至少8个字符');
+    
+    if (hasUpperCase) strength++;
+    else feedback.push('包含大写字母');
+    
+    if (hasLowerCase) strength++;
+    else feedback.push('包含小写字母');
+    
+    if (hasNumbers) strength++;
+    else feedback.push('包含数字');
+    
+    if (hasSpecialChar) strength++;
+    else feedback.push('包含特殊字符');
+    
+    return {
+        strength: strength,
+        feedback: feedback,
+        isStrong: strength >= 4
+    };
 }

@@ -1,5 +1,5 @@
 # 使用Python 3.9作为基础镜像
-FROM python:3.9-slim-buster AS builder
+FROM python:3.9-slim-bookworm AS builder
 
 # 设置工作目录
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# 安装系统依赖
+# 更新包列表并安装系统依赖
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc python3-dev && \
     rm -rf /var/lib/apt/lists/*
@@ -18,7 +18,7 @@ COPY requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
 # 最终阶段
-FROM python:3.9-slim-buster
+FROM python:3.9-slim-bookworm
 
 # 创建非root用户
 RUN useradd -m appuser

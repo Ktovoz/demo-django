@@ -16,19 +16,19 @@
     <!-- 侧边栏 -->
     <nav class="sidebar" id="sideNav">
         <div class="user-info">
-            <div class="row mb-0" style="margin-bottom: 0;">
-                <div class="col s8" style="padding: 0 0.5rem;">
-                    <h6 class="white-text" style="margin: 0 0 8px 0; font-size: 1.2rem; line-height: 1.2;">{{ user.username }}</h6>
-                    <div class="white-text" style="opacity: 0.8; font-size: 0.9rem; margin-bottom: 6px; line-height: 1.2;">{{ user.groups.all.0.name|default:"无用户组" }}</div>
-                    <div class="user-login-time white-text" style="opacity: 0.6; font-size: 0.8rem; line-height: 1.2; display: flex; align-items: center;">
-                        <i class="material-icons tiny" style="font-size: 14px; margin-right: 4px;">access_time</i>
+            <div class="row mb-0">
+                <div class="col s8">
+                    <h6 class="white-text">{{ user.username }}</h6>
+                    <div class="white-text">{{ user.groups.all.0.name|default:"无用户组" }}</div>
+                    <div class="user-login-time white-text">
+                        <i class="material-icons tiny">access_time</i>
                         <span>最近登录: {{ user.last_login|date:"Y-m-d H:i" }}</span>
                     </div>
                 </div>
-                <div class="col s4" style="padding: 0 0.5rem; text-align: right;">
-                    <form method="post" action="{% url 'demo:logout' %}" style="margin: 0;">
+                <div class="col s4" style="text-align: right;">
+                    <form method="post" action="{% url 'demo:logout' %}">
                         {% csrf_token %}
-                        <button class="btn-floating waves-effect waves-light" style="background: transparent; box-shadow: none;">
+                        <button class="btn-floating waves-effect waves-light" type="submit">
                             <i class="material-icons">exit_to_app</i>
                         </button>
                     </form>
@@ -161,10 +161,12 @@
                 <div class="input-field">
                     <input type="text" id="username" required>
                     <label for="username">用户名</label>
+                    <span class="helper-text">请输入用户名</span>
                 </div>
                 <div class="input-field">
                     <input type="email" id="email">
                     <label for="email">邮箱</label>
+                    <span class="helper-text">请输入有效的邮箱地址</span>
                 </div>
                 <div class="input-field" id="passwordGroup">
                     <input type="password" id="password">
@@ -209,11 +211,13 @@
                 <div class="input-field" id="oldPasswordGroup">
                     <input type="password" id="oldPassword" required>
                     <label for="oldPassword">旧密码</label>
+                    <span class="helper-text">请输入当前密码</span>
                 </div>
                 {% endif %}
                 <div class="input-field">
                     <input type="password" id="newPassword" required>
                     <label for="newPassword">新密码</label>
+                    <span class="helper-text">请输入新密码</span>
                 </div>
             </form>
         </div>
@@ -259,11 +263,11 @@
             {% endif %}
         </div>
         <div class="modal-footer">
-            <a class="modal-close waves-effect waves-light">取消</a>
-            <a class="waves-effect waves-light btn save-btn" onclick="saveUser()">保存</a>
+            <a class="modal-close waves-effect waves-light btn-flat">取消</a>
+            <a class="waves-effect waves-light btn" onclick="saveGroupMembers()">保存</a>
         </div>
     </div>
-</body>
+</div>
 
 <script>
     // 设置全局变量

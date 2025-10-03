@@ -5,30 +5,36 @@
 {% block extra_css %}
 <style>
     .register-btn {
-        background: #6a11cb;
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
         color: white;
+        border: none;
     }
     
     .register-btn:hover {
-        background: #4a0d9b;
-        box-shadow: none;
+        background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+        box-shadow: 0 8px 25px rgba(106, 17, 203, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    .register-btn:active {
+        transform: translateY(0);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<body class="auth-body">
+<div class="auth-body">
     <main class="container">
         <form method="post" class="card auth-card">
             {% csrf_token %}
             <div class="card-content">
-                <span class="card-title deep-purple-text text-darken-2" style="font-size: 2rem; font-weight: 500; margin-bottom: 2rem;">
+                <span class="card-title deep-purple-text text-darken-2">
                     <i class="material-icons medium" style="vertical-align: middle">app_registration</i>
                     用户注册
                 </span>
                 
                 {% if messages %}
-                <div class="card-panel auth-card-panel-error" style="margin-bottom: 1.5rem;">
+                <div class="card-panel auth-card-panel-error">
                     <i class="material-icons" style="margin-right: 1rem">error</i>
                     {% for message in messages %}
                         {{ message }}
@@ -39,16 +45,19 @@
                 <div class="input-field auth-input-field">
                     <input id="username" name="username" type="text" class="validate" required>
                     <label for="username">用户名</label>
+                    <span class="helper-text">请输入4-20个字符的用户名</span>
                 </div>
                 
                 <div class="input-field auth-input-field">
                     <input id="password1" name="password1" type="password" class="validate" required>
                     <label for="password1">密码</label>
+                    <span class="helper-text">密码至少包含8个字符</span>
                 </div>
                 
                 <div class="input-field auth-input-field">
                     <input id="password2" name="password2" type="password" class="validate" required>
                     <label for="password2">确认密码</label>
+                    <span class="helper-text">请再次输入密码以确认</span>
                 </div>
                 
                 <button class="btn auth-btn register-btn" type="submit">
@@ -56,7 +65,7 @@
                     注册
                 </button>
                 
-                <div class="row" style="margin-top: 1rem;">
+                <div class="row" style="margin-top: 1.5rem;">
                     <div class="col s12">
                         <p class="left-align">已有账号？
                             <a href="{% url 'demo:login' %}" class="indigo-text">立即登录</a>
@@ -65,10 +74,10 @@
                 </div>
             </div>
             
-            <div class="card-action">
+            <div class="card-action" style="text-align: center; padding: 20px;">
                 <span class="grey-text text-darken-1 small">powered by KTO © 2025</span>
             </div>
         </form>
     </main>
-</body>
+</div>
 {% endblock %}

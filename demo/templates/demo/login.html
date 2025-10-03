@@ -1,34 +1,40 @@
 {% extends 'demo/base.html' %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}用户登录{% endblock %}
 
 {% block extra_css %}
 <style>
     .login-btn {
-        background: #4CAF50;
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
         color: white;
+        border: none;
     }
     
     .login-btn:hover {
-        background: #45a049;
-        box-shadow: none;
+        background: linear-gradient(135deg, #38f9d7 0%, #43e97b 100%);
+        box-shadow: 0 8px 25px rgba(67, 233, 123, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    .login-btn:active {
+        transform: translateY(0);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<body class="auth-body">
+<div class="auth-body">
     <main class="container">
         <form method="post" action="{% url 'demo:login' %}" class="card auth-card">
             {% csrf_token %}
             <div class="card-content">
-                <span class="card-title deep-purple-text text-darken-2" style="font-size: 2rem; font-weight: 500; margin-bottom: 2rem;">
+                <span class="card-title deep-purple-text text-darken-2">
                     <i class="material-icons medium" style="vertical-align: middle">fingerprint</i>
                     Django演示系统
                 </span>
                 
                 {% if messages %}
-                <div class="card-panel auth-card-panel-error" style="margin-bottom: 1.5rem;">
+                <div class="card-panel auth-card-panel-error">
                     <i class="material-icons" style="margin-right: 1rem">error</i>
                     {% for message in messages %}
                         {{ message }}
@@ -37,18 +43,20 @@
                 {% endif %}
                 
                 <div class="input-field auth-input-field">
-                    <input type="text" id="username" name="username" class="validate">
+                    <input type="text" id="username" name="username" class="validate" required>
                     <label for="username">用户名</label>
+                    <span class="helper-text">请输入您的用户名</span>
                 </div>
                 
                 <div class="input-field auth-input-field">
-                    <input type="password" id="password" name="password" class="validate">
+                    <input type="password" id="password" name="password" class="validate" required>
                     <label for="password">密码</label>
+                    <span class="helper-text">请输入您的密码</span>
                 </div>
                 
                 <p class="left-align">
                     <label>
-                        <input type="checkbox" class="filled-in" id="rememberMe"/>
+                        <input type="checkbox" class="filled-in" id="rememberMe" name="remember_me"/>
                         <span>记住我</span>
                     </label>
                 </p>
@@ -58,7 +66,7 @@
                     登录
                 </button>
                 
-                <div class="row" style="margin-top: 1rem;">
+                <div class="row" style="margin-top: 1.5rem;">
                     <div class="col s12">
                         <p class="left-align">还没有账号？ 
                             <a href="{% url 'demo:register' %}" class="indigo-text">立即注册</a>
@@ -67,10 +75,10 @@
                 </div>
             </div>
             
-            <div class="card-action">
+            <div class="card-action" style="text-align: center; padding: 20px;">
                 <span class="grey-text text-darken-1 small">powered by KTO © 2025</span>
             </div>
         </form>
     </main>
-</body>
+</div>
 {% endblock %}
