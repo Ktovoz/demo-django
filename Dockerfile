@@ -39,6 +39,9 @@ RUN mkdir -p /app/demo/static /app/staticfiles /app/media /app/data && \
 # 复制项目文件
 COPY . .
 
+# 收集静态文件（使用生产环境配置）
+RUN python manage.py collectstatic --noinput --clear --settings=DjangoProject.settings_production
+
 # 添加执行权限到启动脚本
 RUN chmod +x entrypoint.sh && \
     chown -R appuser:appuser /app

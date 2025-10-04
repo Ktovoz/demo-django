@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',  # 生产环境启用
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -144,6 +145,9 @@ CSRF_TRUSTED_ORIGINS = [
     'http://*.ktovoz.cn',
     'http://*.ktovoz.com',
 ]
+
+# Whitenoise静态文件配置（生产环境启用）
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # 日志配置
 LOGGING = {
